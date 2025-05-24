@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>📝 Translator Tsunagu For You</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <style>
+    .app-container { max-width: 960px; margin: auto; background: #fff; padding: 2rem; border-radius: 1rem; box-shadow: 0 0 20px rgba(0,0,0,0.05); }
+    .lang-label { font-weight: bold; font-size: 0.9rem; color: #495057; margin-bottom: 0.5rem; }
+    .hyphen-code { letter-spacing: 0.3em; font-family: monospace; }
+    .lang-select-group { display: flex; align-items: center; gap: 1rem; flex-wrap: nowrap; white-space: nowrap; }
+    .lang-select {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      white-space: nowrap;
+    }
+    .lang-select label {
+      white-space: nowrap;
+    }
+    .lang-select i {
+      font-size: 1rem;
+      color: #6c757d;
+    }
+    @media (max-width: 991.98px) {
+      .lang-select-group {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+      }
+    }
+    .offcanvas-body .section-title {
+      font-weight: 600;
+      margin-top: 1rem;
+      margin-bottom: 0.5rem;
+    }
+    .offcanvas-body .btn {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+  </style>
+</head>
+<body class="bg-light">
+  <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm mb-4">
+    <div class="container-fluid">
+      <a class="navbar-brand d-flex align-items-center" href="#">
+        <i class="bi bi-translate fs-3 me-2"></i><span class="h5 mb-0">Translator Tsunagu For You</span>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileMenu">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse d-none d-lg-flex">
+        <ul class="navbar-nav ms-auto align-items-center">
+          <li class="nav-item me-3">
+            <div class="lang-select-group">
+              <div class="lang-select">
+                <i class="bi bi-person-fill"></i>
+                <label for="navMotherLang" class="form-label mb-0 me-1">母語</label>
+                <select id="navMotherLang" class="form-select form-select-sm">
+                  <option value="ja">日本語</option>
+                  <option value="en">English</option>
+                  <option value="ko">한국어</option>
+                  <option value="zh">中文</option>
+                  <option value="fr">Français</option>
+                  <option value="de">Deutsch</option>
+                </select>
+              </div>
+              <div class="lang-select">
+                <i class="bi bi-journal-text"></i>
+                <label for="navLearnLang" class="form-label mb-0 me-1">学習言語</label>
+                <select id="navLearnLang" class="form-select form-select-sm">
+                  <option value="en">English</option>
+                  <option value="ja">日本語</option>
+                  <option value="ko">한국어</option>
+                  <option value="zh">中文</option>
+                  <option value="fr">Français</option>
+                  <option value="de">Deutsch</option>
+                </select>
+              </div>
+            </div>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+              <i class="bi bi-list fs-5"></i>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#apiKeyModal">APIキー設定</a></li>
+              <li><a class="dropdown-item" href="#" data-bs-toggle="offcanvas" data-bs-target="#bookmarkSidebar">📚 ブックマーク</a></li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Offcanvas Mobile Menu -->
+  <div class="offcanvas offcanvas-end" tabindex="-1" id="mobileMenu">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title">メニュー</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body">
+      <div class="mb-3">
+        <label for="mobileMotherLang" class="form-label">母語</label>
+        <select id="mobileMotherLang" class="form-select">
+          <option value="ja">日本語</option>
+          <option value="en">English</option>
+          <option value="ko">한국어</option>
+          <option value="zh">中文</option>
+          <option value="fr">Français</option>
+          <option value="de">Deutsch</option>
+        </select>
+      </div>
+      <div class="mb-4">
+        <label for="mobileLearnLang" class="form-label">学習言語</label>
+        <select id="mobileLearnLang" class="form-select">
+          <option value="en">English</option>
+          <option value="ja">日本語</option>
+          <option value="ko">한국어</option>
+          <option value="zh">中文</option>
+          <option value="fr">Français</option>
+          <option value="de">Deutsch</option>
+        </select>
+      </div>
+      <button class="btn btn-outline-secondary w-100 mb-2" data-bs-toggle="modal" data-bs-target="#apiKeyModal">
+        <i class="bi bi-key"></i> APIキー設定
+      </button>
+      <button class="btn btn-outline-primary w-100 mb-2" data-bs-toggle="offcanvas" data-bs-target="#bookmarkSidebar">
+        <i class="bi bi-bookmarks"></i> ブックマーク
+      </button>
+    </div>
+  </div>
+
+  <div class="app-container">
+    <div class="row g-4">
+      <div class="col-md-6">
+        <div class="lang-label" id="srcInfo">翻訳元</div>
+        <textarea id="inputText" class="form-control mb-2" rows="6" placeholder="ここにテキストを入力…"></textarea>
+        <div class="mt-2 mb-2">
+          <button id="toggleContextBtn" class="btn btn-secondary btn-sm w-100">
+            <i class="bi bi-plus-lg me-1"></i>文脈を追加
+          </button>
+        </div>
+        <div id="contextContainer" class="mb-3 d-none">
+          <textarea id="contextText" class="form-control" rows="2" placeholder="状況やシーンなどの文脈を入力…"></textarea>
+        </div>
+        <div class="d-grid gap-2 d-md-flex">
+          <button id="translateBtn" class="btn btn-primary me-2 w-100 w-md-auto">翻訳する</button>
+          <button id="saveBtn" class="btn btn-success w-100 w-md-auto" disabled>🔖 ブックマーク</button>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="lang-label" id="tgtInfo">翻訳先</div>
+        <div id="result">
+          <div id="translationSection" class="border bg-white p-3 mb-3">
+            <div class="text-muted text-center py-5">翻訳結果がここに表示されます</div>
+            <button id="copyTranslationBtn" class="btn btn-outline-primary btn-sm mt-2" style="display:none;">コピー</button>
+          </div>
+          <div id="explanationSection" class="border bg-white p-3" style="min-height:240px;">
+            <div class="text-muted text-center py-5">解説がここに表示されます</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ブックマークサイドバー全体 -->
+  <div class="offcanvas offcanvas-end" tabindex="-1" id="bookmarkSidebar">
+    <div class="offcanvas-header d-flex justify-content-between align-items-center">
+      <h5 class="offcanvas-title mb-0 d-flex align-items-center">
+        📚 ブックマーク
+      </h5>
+      <div class="d-flex align-items-center gap-2">
+        <button class="btn btn-outline-warning btn-sm" data-bs-toggle="modal" data-bs-target="#dataMgmtModal">
+          <i class="bi bi-gear"></i>
+        </button>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+      </div>
+    </div>
+    <div class="offcanvas-body" id="bookmarkList">
+      <!-- ブックマーク内容がここに出る -->
+    </div>
+  </div>
+
+
+  <div class="modal fade" id="apiKeyModal" tabindex="-1">
+    <div class="modal-dialog"><div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">APIキー設定</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p>
+          この翻訳アプリは<br><strong>GoogleのGemini APIキーの設定が必要です（無料）</strong>
+        </p>
+        <p>
+          <i class="bi bi-info-circle-fill text-info me-1"></i>
+          <a href="https://aistudio.google.com/app/apikey?hl=ja" target="_blank" rel="noopener noreferrer">Google AI Studioの公式ページ</a>
+          にアクセスし、<br>取得したAPIキーを下の入力欄に貼り付けてください。
+        </p>
+        <p></p>
+        <label class="form-label">🔑 Gemini APIキー</label>
+        <input id="envApiKey" type="text" class="form-control" placeholder="APIキーを入力">
+        <div id="apiKeyError" class="text-danger mt-2" style="display:none;"></div>
+      </div>
+      <div class="modal-footer">
+        <button id="apiKeySaveBtn" type="button" class="btn btn-primary">保存</button>
+      </div>
+    </div></div>
+  </div>
+
+  <div class="modal fade" id="dataMgmtModal" tabindex="-1">
+    <div class="modal-dialog"><div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">データ管理</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <button id="exportJsonBtn" class="btn btn-outline-success w-100 mb-2">JSONでエクスポート</button>
+        <div class="mb-2">
+          <label for="importJsonFile" class="form-label">JSONをインポート</label>
+          <input type="file" id="importJsonFile" class="form-control">
+        </div>
+        <button id="importJsonBtn" class="btn btn-outline-danger w-100">インポート実行</button>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- ブックマーク詳細モーダル -->
+  <div class="modal fade" id="bookmarkDetailModal" tabindex="-1">
+    <div class="modal-dialog modal-lg"><div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">📘 ブックマーク詳細</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p><strong>原文:</strong></p>
+        <div id="modalOriginalText" class="border p-2 bg-light"></div>
+        <hr>
+        <p><strong>訳文:</strong></p>
+        <div id="modalTranslatedText" class="border p-2 bg-white"></div>
+        <hr>
+        <p><strong>文脈:</strong></p>
+        <div id="modalContextText" class="border p-2 bg-white"></div>
+        <hr>
+        <p><strong>解説セクション:</strong></p>
+        <div id="modalExplanationText" class="border p-2 bg-white"></div>
+      </div>
+    </div></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
