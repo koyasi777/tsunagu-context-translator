@@ -36,7 +36,7 @@ Unlike typical AI translators, it's designed to support deeper understanding and
 
 ## 🔗 Try It Now (Access here 👇)
 
-▶︎ [https://koyasi777.github.io/translator-tsunagu-for-you](https://koyasi777.github.io/Translator-Tsunagu-For-You)
+▶︎ [https://koyasi777.github.io/Translator-Tsunagu-For-You](https://koyasi777.github.io/Translator-Tsunagu-For-You)
 
 ※ On first use, you’ll be asked to enter an API key for the translation service (free to obtain).
 
