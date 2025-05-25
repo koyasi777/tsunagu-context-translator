@@ -117,6 +117,44 @@ explainModeToggle.addEventListener('change', () => {
   explanationSection.style.display = isOn ? 'block' : 'none';
 });
 
+// ── ① ページロード時に「文脈設定」を復元 ──
+(function initContext() {
+  // localStorage から状態を取得
+  const savedEnabled = localStorage.getItem('contextEnabled');
+  const savedText    = localStorage.getItem('contextText') || '';
+
+  // テキストエリアに前回の入力内容をセット
+  contextText.value = savedText;
+
+  // 表示状態を判定（'true' なら表示）
+  const enabled = savedEnabled === 'true';
+  if (enabled) {
+    contextContainer.classList.remove('d-none');
+    toggleContextBtn.innerHTML = '<i class="bi bi-dash-lg me-1"></i>文脈を削除';
+  } else {
+    contextContainer.classList.add('d-none');
+    toggleContextBtn.innerHTML = '<i class="bi bi-plus-lg me-1"></i>文脈を追加';
+  }
+})();
+
+// ── ② ボタン押下時に表示状態を保存 ──
+toggleContextBtn.addEventListener('click', () => {
+  const isCurrentlyVisible = !contextContainer.classList.contains('d-none');
+  const willBeVisible = !isCurrentlyVisible;
+
+  contextContainer.classList.toggle('d-none');
+  toggleContextBtn.innerHTML = willBeVisible
+    ? '<i class="bi bi-dash-lg me-1"></i>文脈を削除'
+    : '<i class="bi bi-plus-lg me-1"></i>文脈を追加';
+
+  localStorage.setItem('contextEnabled', String(willBeVisible));
+});
+
+// ── ③ テキスト入力時に内容を保存 ──
+contextText.addEventListener('input', () => {
+  localStorage.setItem('contextText', contextText.value);
+});
+
 // ==== Gemini モデル選択・URL構成 ====
 const GEMINI_MODELS = {
   'gemini-2.0-flash-lite': {
@@ -211,14 +249,6 @@ saveLangBtn.addEventListener('click', () => {
 
   // モーダルを閉じる
   bootstrap.Modal.getInstance(document.getElementById('mobileLangModal')).hide();
-});
-
-toggleContextBtn.addEventListener('click', () => {
-  const shown = !contextContainer.classList.contains('d-none');
-  contextContainer.classList.toggle('d-none');
-  toggleContextBtn.innerHTML = shown
-    ? '<i class="bi bi-plus-lg me-1"></i>文脈を追加'
-    : '<i class="bi bi-dash-lg me-1"></i>文脈を削除';
 });
 
 const scriptRegexMap = {
