@@ -88,7 +88,12 @@
               <i class="bi bi-list fs-5"></i>
             </a>
             <ul class="dropdown-menu dropdown-menu-end">
-              <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#apiKeyModal">APIキー設定</a></li>
+              <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#apiKeyModal">🔑 APIキー設定</a></li>
+              <li>
+                <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#modelSettingModal">
+                  🛠️ モデル設定
+                </a>
+              </li>
               <li><a class="dropdown-item" href="#" data-bs-toggle="offcanvas" data-bs-target="#bookmarkSidebar">📚 ブックマーク</a></li>
             </ul>
           </li>
@@ -104,8 +109,14 @@
       <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
     </div>
     <div class="offcanvas-body">
+      <button class="btn btn-outline-secondary w-100 mb-2" data-bs-toggle="modal" data-bs-target="#mobileLangModal">
+        <i class="bi bi-gear"></i> 言語設定
+      </button>
       <button class="btn btn-outline-secondary w-100 mb-2" data-bs-toggle="modal" data-bs-target="#apiKeyModal">
         <i class="bi bi-key"></i> APIキー設定
+      </button>
+      <button class="btn btn-outline-secondary w-100 mb-2" data-bs-toggle="modal" data-bs-target="#modelSettingModal">
+        <i class="bi bi-cpu"></i> モデル設定
       </button>
       <button class="btn btn-outline-primary w-100 mb-2" data-bs-toggle="offcanvas" data-bs-target="#bookmarkSidebar">
         <i class="bi bi-bookmarks"></i> ブックマーク
@@ -145,7 +156,7 @@
         <div id="result">
           <div id="translationSection" class="border bg-white p-3 mb-3">
             <div class="text-muted text-center py-5">翻訳結果がここに表示されます</div>
-            <button id="copyTranslationBtn" class="btn btn-outline-primary btn-sm mt-2" style="display:none;">コピー</button>
+            <button id="copyTranslationBtn" class="btn btn-outline-primary btn-sm mt-2" style="display:none;">Copy</button>
           </div>
           <div id="explanationSection" class="border bg-white p-3" style="min-height:240px;">
             <div class="text-muted text-center py-5">解説がここに表示されます</div>
@@ -241,6 +252,24 @@
         </div>
       </div>
     </div>
+  </div>
+
+  <div class="modal fade" id="modelSettingModal" tabindex="-1">
+    <div class="modal-dialog"><div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">モデル設定</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <label for="modelSelect" class="form-label">使用するGeminiモデルを選択:</label>
+        <select id="modelSelect" class="form-select">
+          <!-- JSで動的に埋める -->
+        </select>
+      </div>
+      <div class="modal-footer">
+        <button id="saveModelBtn" type="button" class="btn btn-primary">保存</button>
+      </div>
+    </div></div>
   </div>
 
   <div class="modal fade" id="dataMgmtModal" tabindex="-1">
