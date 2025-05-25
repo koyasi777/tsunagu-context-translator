@@ -87,6 +87,7 @@ const contextText = document.getElementById('contextText');
 const contextContainer = document.getElementById('contextContainer');
 const toggleContextBtn = document.getElementById('toggleContextBtn');
 const translateBtn = document.getElementById('translateBtn');
+const explainModeToggle = document.getElementById('explainModeToggle');
 const saveBtn = document.getElementById('saveBtn');
 const translationSection = document.getElementById('translationSection');
 const explanationSection = document.getElementById('explanationSection');
@@ -96,6 +97,23 @@ const copyTranslationBtn = document.getElementById('copyTranslationBtn');
 const exportJsonBtn = document.getElementById('exportJsonBtn');
 const importJsonFile = document.getElementById('importJsonFile');
 const importJsonBtn = document.getElementById('importJsonBtn');
+
+// ページロード時に保存済み設定を読み込んで反映
+(function initExplainMode() {
+  const saved = localStorage.getItem('explainMode');
+  if (saved !== null) {
+    const isOn = (saved === 'true');
+    explainModeToggle.checked         = isOn;
+    explanationSection.style.display  = isOn ? 'block' : 'none';
+  }
+})();
+
+// トグル変更時にローカルストレージへ保存＆表示切替
+explainModeToggle.addEventListener('change', () => {
+  const isOn = explainModeToggle.checked;
+  localStorage.setItem('explainMode', isOn);
+  explanationSection.style.display = isOn ? 'block' : 'none';
+});
 
 // ==== Gemini モデル選択・URL構成 ====
 const GEMINI_MODELS = {
@@ -226,33 +244,45 @@ function detectLangs(text) {
   return { src, tgt };
 }
 
-function generatePrompt(text, src, mother, learn, context) {
-  const fromLabel = languageLabel(src);
-  const toLabel = languageLabel(src === mother ? learn : mother);
+function generatePrompt(text, src, mother, learn, context, enableExplanation) {
+  const fromLabel   = languageLabel(src);
+  const toLabel     = languageLabel(src === mother ? learn : mother);
   const motherLabel = languageLabel(mother);
-  const learnLabel = languageLabel(learn);
+  const learnLabel  = languageLabel(learn);
   const directionDesc = `${toLabel}に翻訳・意訳した内容`;
 
   let prompt = `あなたは、${motherLabel}を母語とするuserが、${learnLabel}を学ぶ為に設計された高性能翻訳アシスタントです。
 翻訳元とは、userが入力した${fromLabel}の内容。
-翻訳先とは、${directionDesc}。
-解説セクションとは、翻訳先の内容を${motherLabel}で教えるセクション。
+翻訳先とは、${directionDesc}。`;
 
-以下を実行してください：
-
-1. シチュエーションに沿った自然な${toLabel}に翻訳・意訳してください。
-2. 解説セクションには、まず読み方や発音方法、詳細なニュアンスの説明、例文、類義語、対義語、${learnLabel}を母語とする人たちとの文化的背景の差異などを含めて**${motherLabel}で**教えてください。
-
-※出力制限
-- 返事はせずに以下のフォーマットに沿って出力
-- **翻訳元の内容を繰り返し出力しない**
-`;
-
-  if (context) {
-    prompt += `\n【補足文脈】\n${context}`;
+  // 🔄 解説モードがONのときだけ、この説明を含める
+  if (enableExplanation) {
+    prompt += `解説セクションとは、翻訳先の内容を${motherLabel}で教えるセクション。`;
   }
 
-  prompt += `\n\n翻訳先:\n${text}\n\n解説セクション:`;
+  prompt += `
+以下を実行してください：
+
+1. シチュエーションに沿った自然な${toLabel}に翻訳・意訳してください。`;
+
+  if (enableExplanation) {
+    prompt += `2. 解説セクションには、まず読み方や発音方法、詳細なニュアンスの説明、例文、類義語、対義語、${learnLabel}を母語とする人たちとの文化的背景の差異などを含めて**${motherLabel}で**教えてください。`;
+  }
+
+  prompt += `
+※出力制限
+- 返事はせずに以下のフォーマットに沿って出力
+- **翻訳元の内容を繰り返し出力しない**`;
+
+  if (context) {
+    prompt += `【補足文脈】${context}`;
+  }
+
+  prompt += `翻訳先:${text}`;
+
+  if (enableExplanation) {
+    prompt += `解説セクション:`;
+  }
 
   return prompt;
 }
@@ -287,7 +317,14 @@ translateBtn.addEventListener('click', async () => {
   explanationSection.innerHTML = `<div class="text-muted text-center py-5">解説がここに表示されます</div>`;
 
   try {
-    const prompt = generatePrompt(text, src, mother, learn, context);
+    // ① トグル状態取得
+    const enableExplanation = explainModeToggle.checked;
+    // ② UI 側で解説セクションの表示/非表示を制御
+    explanationSection.style.display = enableExplanation ? 'block' : 'none';
+    // ③ generatePrompt にフラグを渡す
+    const prompt = generatePrompt(
+      text, src, mother, learn, context, enableExplanation
+    );
     const res = await fetch(`${getGeminiEndpoint()}?key=${apiKey}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
