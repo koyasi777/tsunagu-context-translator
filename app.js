@@ -267,6 +267,47 @@ function languageLabel(code) {
   return labels[code] || code;
 }
 
+// 翻訳先に複数言語が含まれるかどうかを判定する関数
+function detectMultipleLangs(text) {
+  return Object.entries(scriptRegexMap)
+    .filter(([lang, regex]) => regex.test(text))
+    .map(([lang]) => lang);
+}
+
+// Gemini で主要言語を判定するための軽量で高速なエンドポイント
+function getFastLanguageDetectionEndpoint() {
+  return `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent`;
+}
+
+// Gemini で主要言語を判定する関数
+async function determinePrimaryLanguage(text) {
+  const apiKey = getLocalSetting('geminiApiKey');
+  const prompt = `
+次の文は複数言語が混在している可能性があります。
+
+【文】
+${text}
+
+この文全体を見て、主にどの言語で書かれているか、言語コード（ja, en, ko, zh, fr, de）で答えてください。
+`;
+  const res = await fetch(`${getFastLanguageDetectionEndpoint()}?key=${apiKey}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      contents: [{ parts: [{ text: prompt }] }],
+      generationConfig: { maxOutputTokens: 10 }
+    })
+  });
+  const json = await res.json();
+  const langName = json.candidates?.[0]?.content?.parts?.[0]?.text.trim();
+  const codeMap = {
+    日本語: 'ja', 英語: 'en', 한국어: 'ko',
+    中国語: 'zh', フランス語: 'fr', ドイツ語: 'de',
+    ja: 'ja', en: 'en', ko: 'ko', zh: 'zh', fr: 'fr', de: 'de'
+  };
+  return codeMap[langName] || getLocalSetting('motherLang', 'ja');
+}
+
 function detectLangs(text) {
   const mother = getLocalSetting('motherLang', 'ja');
   const learn = getLocalSetting('learnLang', 'en');
@@ -356,8 +397,20 @@ translateBtn.addEventListener('click', async () => {
 
   if (!text) return;
 
-  currentLangs = detectLangs(text);
-  const { src, tgt } = currentLangs;
+  // ── ここから言語判定フロー ──
+  const langsDetected = detectMultipleLangs(text);
+  let src, tgt;
+
+  if (langsDetected.length === 1) {
+    // 単一言語 → 既存ロジック
+    ({ src, tgt } = detectLangs(text));
+  } else {
+    // 多言語混在 → Gemini に主要言語を判定させる
+    src = await determinePrimaryLanguage(text);
+    tgt = src === mother ? learn : mother;
+  }
+
+  currentLangs = { src, tgt };
   srcInfo.textContent = `翻訳元（${languageLabel(src)}）`;
   tgtInfo.textContent = `翻訳先（${languageLabel(tgt)}）`;
 
