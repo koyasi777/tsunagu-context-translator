@@ -357,16 +357,57 @@ translateBtn.addEventListener('click', async () => {
 });
 
 saveBtn.addEventListener('click', async () => {
-  await saveTranslation({
-    timestamp: Date.now(),
-    original: inputText.value.trim(),
-    translated: currentTranslation,
-    explanation: explanationSection.textContent.trim(),
-    context: contextText.value.trim(),
-    src: currentLangs.src,
-    tgt: currentLangs.tgt
-  });
-  loadBookmarks();
+  if (!currentTranslation || currentTranslation.trim() === '') {
+    const toastEl = document.getElementById('bookmarkToast');
+    const toastBody = toastEl.querySelector('.toast-body');
+    const toast = bootstrap.Toast.getOrCreateInstance(toastEl);
+
+    // 警告メッセージに変更して表示
+    toastBody.textContent = '⚠️ 翻訳がまだ実行されていません。先に「翻訳する」ボタンを押してください。';
+    toastEl.classList.remove('bg-success');
+    toastEl.classList.add('bg-warning');
+    toast.show();
+
+    // 一定時間後に内容と背景色を戻す ＋ トーストを明示的に非表示にする
+    setTimeout(() => {
+      toast.hide(); // 🔁 明示的に非表示
+      toastBody.textContent = '📚 ブックマークに追加しました！';
+      toastEl.classList.remove('bg-warning');
+      toastEl.classList.add('bg-success');
+    }, 3000);
+
+    return;
+  }
+
+  saveBtn.disabled = true;
+  const origHTML = saveBtn.innerHTML;
+  saveBtn.innerHTML = `<span class="spinner-border spinner-border-sm me-1"></span> 保存中…`;
+
+  try {
+    await saveTranslation({
+      timestamp: Date.now(),
+      original: inputText.value.trim(),
+      translated: currentTranslation,
+      explanation: explanationSection.textContent.trim(),
+      context: contextText.value.trim(),
+      src: currentLangs.src,
+      tgt: currentLangs.tgt
+    });
+    loadBookmarks();
+    saveBtn.innerHTML = `<i class="bi bi-check2-circle me-1"></i> 保存しました！`;
+
+    const toastEl = document.getElementById('bookmarkToast');
+    const toast = bootstrap.Toast.getOrCreateInstance(toastEl);
+    toast.show();
+  } catch (e) {
+    alert('保存に失敗しました');
+    saveBtn.innerHTML = origHTML;
+  } finally {
+    setTimeout(() => {
+      saveBtn.disabled = false;
+      saveBtn.innerHTML = origHTML;
+    }, 1500);
+  }
 });
 
 exportJsonBtn.addEventListener('click', async () => {
@@ -434,7 +475,7 @@ importJsonBtn.addEventListener('click', () => {
 
   const modelSelect = document.getElementById('modelSelect');
   const saveModelBtn = document.getElementById('saveModelBtn');
-  
+
   if (modelSelect && saveModelBtn) {
     // モデルリストを動的生成
     modelSelect.innerHTML = '';
@@ -444,9 +485,9 @@ importJsonBtn.addEventListener('click', () => {
       option.textContent = model.label;
       modelSelect.appendChild(option);
     });
-  
+
     modelSelect.value = getSelectedModel();
-  
+
     saveModelBtn.addEventListener('click', () => {
       localStorage.setItem('geminiModel', modelSelect.value);
       bootstrap.Modal.getInstance(document.getElementById('modelSettingModal')).hide();
