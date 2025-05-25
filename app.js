@@ -97,6 +97,50 @@ const exportJsonBtn = document.getElementById('exportJsonBtn');
 const importJsonFile = document.getElementById('importJsonFile');
 const importJsonBtn = document.getElementById('importJsonBtn');
 
+// ==== Gemini モデル選択・URL構成 ====
+const GEMINI_MODELS = {
+  'gemini-2.0-flash-lite': {
+    id: 'gemini-2.0-flash-lite',
+    label: '🔹 Gemini 2.0 Flash-Lite（安定版）'
+  },
+  'gemini-2.0-flash': {
+    id: 'gemini-2.0-flash',
+    label: '🔹 Gemini 2.0 Flash'
+  },
+  'gemini-2.5-flash-preview-05-20': {
+    id: 'gemini-2.5-flash-preview-05-20',
+    label: '🔹 Gemini 2.5 Flash preview'
+  },
+  'gemini-2.5-pro-preview-05-06': {
+    id: 'gemini-2.5-pro-preview-05-06',
+    label: '🔹 Gemini 2.5 Pro preview'
+  },
+  'gemini-1.5-flash': {
+    id: 'gemini-1.5-flash',
+    label: '🔹 Gemini 1.5 Flash'
+  },
+  'gemini-1.5-flash-8b': {
+    id: 'gemini-1.5-flash-8b',
+    label: '🔹 Gemini 1.5 Flash-8B'
+  },
+  'gemini-1.5-pro': {
+    id: 'gemini-1.5-pro',
+    label: '🔹 Gemini 1.5 Pro'
+  },
+};
+
+const DEFAULT_MODEL_KEY = 'gemini-2.0-flash-lite'; // デフォルト設定のモデル
+
+function getSelectedModel() {
+  const key = localStorage.getItem('geminiModel');
+  return key in GEMINI_MODELS ? key : DEFAULT_MODEL_KEY;
+}
+
+function getGeminiEndpoint() {
+  const key = getSelectedModel();
+  return `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODELS[key].id}:generateContent`;
+}
+
 let currentTranslation = '';
 let currentLangs = {};
 
@@ -243,9 +287,13 @@ translateBtn.addEventListener('click', async () => {
 
   try {
     const prompt = generatePrompt(text, src, mother, learn, context);
-    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { maxOutputTokens: 4096 } })
+    const res = await fetch(`${getGeminiEndpoint()}?key=${apiKey}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { maxOutputTokens: 4096 }
+      })
     });
     const json = await res.json();
     const out = json.candidates?.[0]?.content?.parts?.[0]?.text || '';
@@ -268,12 +316,10 @@ translateBtn.addEventListener('click', async () => {
     const copyBtn = document.createElement('button');
     copyBtn.className = 'btn btn-outline-primary btn-sm';
     copyBtn.style.position = 'absolute';
-    // copyBtn.style.bottom = '1rem';
-    // copyBtn.style.right = '1rem';
     copyBtn.style.bottom = '0';
     copyBtn.style.right = '0';
     copyBtn.style.zIndex = '10';
-    copyBtn.innerHTML = `<i class="bi bi-clipboard"></i> <span>コピー</span>`;
+    copyBtn.innerHTML = `<i class="bi bi-clipboard"></i> <span>Copy</span>`;
 
     // コピーイベント設定
     copyBtn.addEventListener('click', () => {
@@ -281,11 +327,11 @@ translateBtn.addEventListener('click', async () => {
         const icon = copyBtn.querySelector('i');
         const label = copyBtn.querySelector('span');
         icon.className = 'bi bi-check2-circle';
-        label.textContent = 'コピー済み！';
+        label.textContent = 'Copied!';
 
         setTimeout(() => {
           icon.className = 'bi bi-clipboard';
-          label.textContent = 'コピー';
+          label.textContent = 'Copy';
         }, 1500);
       });
     });
@@ -384,5 +430,26 @@ importJsonBtn.addEventListener('click', () => {
   if (!getLocalSetting('geminiApiKey')) {
     const modal = new bootstrap.Modal(document.getElementById('apiKeyModal'));
     modal.show();
+  }
+
+  const modelSelect = document.getElementById('modelSelect');
+  const saveModelBtn = document.getElementById('saveModelBtn');
+  
+  if (modelSelect && saveModelBtn) {
+    // モデルリストを動的生成
+    modelSelect.innerHTML = '';
+    Object.entries(GEMINI_MODELS).forEach(([key, model]) => {
+      const option = document.createElement('option');
+      option.value = key;
+      option.textContent = model.label;
+      modelSelect.appendChild(option);
+    });
+  
+    modelSelect.value = getSelectedModel();
+  
+    saveModelBtn.addEventListener('click', () => {
+      localStorage.setItem('geminiModel', modelSelect.value);
+      bootstrap.Modal.getInstance(document.getElementById('modelSettingModal')).hide();
+    });
   }
 })();
