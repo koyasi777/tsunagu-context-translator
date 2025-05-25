@@ -124,6 +124,30 @@ apiKeySaveBtn.addEventListener('click', () => {
   bootstrap.Modal.getInstance(document.getElementById('apiKeyModal')).hide();
 });
 
+// モーダル要素取得
+const modalMotherLang = document.getElementById('modalMotherLang');
+const modalLearnLang  = document.getElementById('modalLearnLang');
+const saveLangBtn     = document.getElementById('saveLangBtn');
+
+// 初期表示：ローカルストレージから取得してモーダルのセレクトを反映
+modalMotherLang.value = getLocalSetting('motherLang', 'ja');
+modalLearnLang.value  = getLocalSetting('learnLang', 'en');
+
+// 保存ボタン押下時の処理（モーダル内）
+saveLangBtn.addEventListener('click', () => {
+  const mother = modalMotherLang.value;
+  const learn = modalLearnLang.value;
+  localStorage.setItem('motherLang', mother);
+  localStorage.setItem('learnLang', learn);
+
+  // ナビゲーションのセレクトにも反映（デスクトップ表示用）
+  navMotherLang.value = mother;
+  navLearnLang.value  = learn;
+
+  // モーダルを閉じる
+  bootstrap.Modal.getInstance(document.getElementById('mobileLangModal')).hide();
+});
+
 toggleContextBtn.addEventListener('click', () => {
   const shown = !contextContainer.classList.contains('d-none');
   contextContainer.classList.toggle('d-none');
