@@ -101,11 +101,13 @@ const importJsonBtn = document.getElementById('importJsonBtn');
 // ページロード時に保存済み設定を読み込んで反映
 (function initExplainMode() {
   const saved = localStorage.getItem('explainMode');
-  if (saved !== null) {
-    const isOn = (saved === 'true');
-    explainModeToggle.checked         = isOn;
-    explanationSection.style.display  = isOn ? 'block' : 'none';
-  }
+  // saved が null → toggle.checked（HTMLの checked 属性）を初期値として使う
+  const isOn = saved === null
+    ? explainModeToggle.checked
+    : (saved === 'true');
+
+  explainModeToggle.checked        = isOn;
+  explanationSection.style.display = isOn ? 'block' : 'none';
 })();
 
 // トグル変更時にローカルストレージへ保存＆表示切替
