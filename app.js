@@ -143,6 +143,7 @@ function getGeminiEndpoint() {
 
 let currentTranslation = '';
 let currentLangs = {};
+let currentExplanationRaw = '';
 
 function getLocalSetting(key, fallback = '') {
   return localStorage.getItem(key) || fallback;
@@ -300,7 +301,7 @@ translateBtn.addEventListener('click', async () => {
     const [partTrans, partExpl] = out.split(/解説セクション:/);
     const translationRaw = partTrans.replace(/^[\s\n]*翻訳先:\s*/i, '').trim();
     const explanationRaw = (partExpl || '').trim();
-
+    currentExplanationRaw = explanationRaw;
 
     // 翻訳出力＋ボタン表示エリア全体を構築
     const wrapper = document.createElement('div');
@@ -388,7 +389,7 @@ saveBtn.addEventListener('click', async () => {
       timestamp: Date.now(),
       original: inputText.value.trim(),
       translated: currentTranslation,
-      explanation: explanationSection.textContent.trim(),
+      explanation: currentExplanationRaw,
       context: contextText.value.trim(),
       src: currentLangs.src,
       tgt: currentLangs.tgt
