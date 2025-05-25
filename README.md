@@ -2,6 +2,10 @@
 **A translation app focused on language learning, with natural, context-aware output and detailed explanations in your native language.**  
 Unlike typical AI translators, it's designed to support deeper understanding and cross-cultural communication.
 
+<p align="center">
+  <img src="https://koyasi777.github.io/Translator-Tsunagu-For-You/ogp-image.png" alt="Translator Tsunagu For You OGP" width="100%" />
+</p>
+
 > 🇯🇵 日本語版READMEはこちら: [README.ja.md](./README.ja.md)
 
 ---
