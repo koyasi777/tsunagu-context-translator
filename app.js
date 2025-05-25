@@ -257,33 +257,49 @@ function generatePrompt(text, src, mother, learn, context, enableExplanation) {
 翻訳元とは、userが入力した${fromLabel}の内容。
 翻訳先とは、${directionDesc}。`;
 
-  // 🔄 解説モードがONのときだけ、この説明を含める
   if (enableExplanation) {
-    prompt += `解説セクションとは、翻訳先の内容を${motherLabel}で教えるセクション。`;
+    prompt += `
+解説セクションとは、翻訳先の内容を${motherLabel}で教えるセクション。`;
   }
 
   prompt += `
+
 以下を実行してください：
 
 1. シチュエーションに沿った自然な${toLabel}に翻訳・意訳してください。`;
 
   if (enableExplanation) {
-    prompt += `2. 解説セクションには、まず読み方や発音方法、詳細なニュアンスの説明、例文、類義語、対義語、${learnLabel}を母語とする人たちとの文化的背景の差異などを含めて**${motherLabel}で**教えてください。`;
+    prompt += `
+2. 解説セクションには、まず読み方や発音方法、詳細なニュアンスの説明、例文、類義語、対義語、${learnLabel}を母語とする人たちとの文化的背景の差異などを含めて**${motherLabel}で**教えてください。`;
   }
 
+  // 出力制限セクション
   prompt += `
+
 ※出力制限
 - 返事はせずに以下のフォーマットに沿って出力
-- **翻訳元の内容を繰り返し出力しない**`;
+- **${context ? '翻訳元や補足文脈の内容を繰り返し出力しない' : '翻訳元の内容を繰り返し出力しない'}**`;
 
+  // 補足文脈がある場合にのみ追加
   if (context) {
-    prompt += `【補足文脈】${context}`;
+    prompt += `
+【補足文脈】
+${context}`;
   }
 
-  prompt += `翻訳先:${text}`;
-
+  // 翻訳先と解説セクション
   if (enableExplanation) {
-    prompt += `解説セクション:`;
+    prompt += `
+
+翻訳先:
+${text}
+
+解説セクション:`;
+  } else {
+    prompt += `
+
+翻訳先:
+${text}`;
   }
 
   return prompt;
