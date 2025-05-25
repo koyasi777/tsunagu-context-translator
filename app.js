@@ -422,12 +422,15 @@ translateBtn.addEventListener('click', async () => {
       });
     });
 
-    // 要素をDOMに追加
+    // カスタムクラスを使って余白と配置を分離
+    wrapper.classList.add('translation-wrapper');
+    copyBtn.classList.add('copy-btn');
+
     wrapper.appendChild(resultDiv);
     wrapper.appendChild(copyBtn);
+
     translationSection.innerHTML = ''; // 既存を消す
     translationSection.appendChild(wrapper);
-
 
     explanationSection.innerHTML = `<div class="markdown-body">${marked.parse(explanationRaw)}</div>`;
     copyTranslationBtn.style.display = 'inline-block';
