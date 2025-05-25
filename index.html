@@ -59,8 +59,7 @@
           <li class="nav-item me-3">
             <div class="lang-select-group">
               <div class="lang-select">
-                <i class="bi bi-person-fill"></i>
-                <label for="navMotherLang" class="form-label mb-0 me-1">母語</label>
+                <label for="navMotherLang" class="form-label mb-0 me-1">👤 母語</label>
                 <select id="navMotherLang" class="form-select form-select-sm">
                   <option value="ja">日本語</option>
                   <option value="en">English</option>
@@ -70,9 +69,9 @@
                   <option value="de">Deutsch</option>
                 </select>
               </div>
+              <span class="lang-separator">/</span>
               <div class="lang-select">
-                <i class="bi bi-journal-text"></i>
-                <label for="navLearnLang" class="form-label mb-0 me-1">学習言語</label>
+                <label for="navLearnLang" class="form-label mb-0 me-1">📝 学習言語</label>
                 <select id="navLearnLang" class="form-select form-select-sm">
                   <option value="en">English</option>
                   <option value="ja">日本語</option>
@@ -105,28 +104,6 @@
       <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
     </div>
     <div class="offcanvas-body">
-      <div class="mb-3">
-        <label for="mobileMotherLang" class="form-label">母語</label>
-        <select id="mobileMotherLang" class="form-select">
-          <option value="ja">日本語</option>
-          <option value="en">English</option>
-          <option value="ko">한국어</option>
-          <option value="zh">中文</option>
-          <option value="fr">Français</option>
-          <option value="de">Deutsch</option>
-        </select>
-      </div>
-      <div class="mb-4">
-        <label for="mobileLearnLang" class="form-label">学習言語</label>
-        <select id="mobileLearnLang" class="form-select">
-          <option value="en">English</option>
-          <option value="ja">日本語</option>
-          <option value="ko">한국어</option>
-          <option value="zh">中文</option>
-          <option value="fr">Français</option>
-          <option value="de">Deutsch</option>
-        </select>
-      </div>
       <button class="btn btn-outline-secondary w-100 mb-2" data-bs-toggle="modal" data-bs-target="#apiKeyModal">
         <i class="bi bi-key"></i> APIキー設定
       </button>
@@ -139,7 +116,16 @@
   <div class="app-container">
     <div class="row g-4">
       <div class="col-md-6">
-        <div class="lang-label" id="srcInfo">翻訳元</div>
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <div class="lang-label d-flex align-items-center mb-0" id="srcInfo">翻訳元</div>
+          <!-- モバイル用 Language Settings ボタン -->
+          <button id="mobileLangBtn"
+                  class="btn btn-outline-secondary btn-sm d-lg-none"
+                  data-bs-toggle="modal"
+                  data-bs-target="#mobileLangModal">
+            <i class="bi bi-gear"></i> Language Settings
+          </button>
+        </div>
         <textarea id="inputText" class="form-control mb-2" rows="6" placeholder="ここにテキストを入力…"></textarea>
         <div class="mt-2 mb-2">
           <button id="toggleContextBtn" class="btn btn-secondary btn-sm w-100">
@@ -200,7 +186,7 @@
         </p>
         <p>
           <i class="bi bi-info-circle-fill text-info me-1"></i>
-          <a href="https://aistudio.google.com/app/apikey?hl=ja" target="_blank" rel="noopener noreferrer">Google AI Studioの公式ページ</a>
+          <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer">Google AI Studioの公式ページ</a>
           にアクセスし、<br>取得したAPIキーを下の入力欄に貼り付けてください。
         </p>
         <p></p>
@@ -212,6 +198,49 @@
         <button id="apiKeySaveBtn" type="button" class="btn btn-primary">保存</button>
       </div>
     </div></div>
+  </div>
+
+  <div class="modal fade" id="mobileLangModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">言語設定</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="modalMotherLang" class="form-label d-flex align-items-center">
+              👤 母語
+            </label>
+            <select id="modalMotherLang" class="form-select">
+              <option value="ja">日本語</option>
+              <option value="en">English</option>
+              <option value="ko">한국어</option>
+              <option value="zh">中文</option>
+              <option value="fr">Français</option>
+              <option value="de">Deutsch</option>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label for="modalLearnLang" class="form-label d-flex align-items-center">
+              📝 学習言語
+            </label>
+            <select id="modalLearnLang" class="form-select">
+              <option value="en">English</option>
+              <option value="ja">日本語</option>
+              <option value="ko">한국어</option>
+              <option value="zh">中文</option>
+              <option value="fr">Français</option>
+              <option value="de">Deutsch</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button id="saveLangBtn" type="button" class="btn btn-primary">保存</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div class="modal fade" id="dataMgmtModal" tabindex="-1">
