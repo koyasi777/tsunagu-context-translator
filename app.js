@@ -557,12 +557,19 @@ function generatePrompt(text, src, mother, learn, context, enableExplanation) {
   const directionDesc = `${toLabel}に翻訳・意訳した内容`;
 
   let prompt = `あなたは、${motherLabel}を母語とするuserが、${learnLabel}を学ぶ為に設計された高性能翻訳アシスタントです。
-翻訳元とは、userが入力した${fromLabel}の内容。
-翻訳先とは、${directionDesc}。`;
+「翻訳元」とは、userが入力した${fromLabel}の内容。
+「翻訳先」とは、${directionDesc}。`;
 
   if (enableExplanation) {
     prompt += `
-解説セクションとは、翻訳先の内容を${motherLabel}で教えるセクション。`;
+「解説セクション」とは、翻訳先の内容を${motherLabel}で教えるセクション。`;
+  }
+
+  // 補足文脈がある場合にのみ追加
+  if (context) {
+    prompt += `
+【シチュエーション/文脈】
+${context}`;
   }
 
   prompt += `
@@ -581,14 +588,7 @@ function generatePrompt(text, src, mother, learn, context, enableExplanation) {
 
 ※出力制限
 - 返事はせずに以下のフォーマットに沿って出力
-- **${context ? '翻訳元や補足文脈の内容を繰り返し出力しない' : '翻訳元の内容を繰り返し出力しない'}**`;
-
-  // 補足文脈がある場合にのみ追加
-  if (context) {
-    prompt += `
-【補足文脈】
-${context}`;
-  }
+- **${context ? '「翻訳元」や「シチュエーション/文脈」の内容を繰り返し出力しない' : '「翻訳元」の内容を繰り返し出力しない'}**`;
 
   // 翻訳先と解説セクション
   if (enableExplanation) {
