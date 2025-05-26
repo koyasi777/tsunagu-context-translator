@@ -449,12 +449,87 @@ saveLangBtn.addEventListener('click', () => {
   bootstrap.Modal.getInstance(document.getElementById('mobileLangModal')).hide();
 });
 
+// ── 1. スクリプト判定用マップを拡張 ──
+// 「一意に定まる文字」を含む Unicode ブロックも追加
 const scriptRegexMap = {
-  // ひらがな・カタカナがあれば日本語とみなす
-  ja: /[\u3040-\u30ff\u31f0-\u31ff]/,
-  // ハングルがあれば韓国語とみなす
-  ko: /[\uac00-\ud7af]/
+  // ひらがな・カタカナ・記号を含む日本語
+  ja: /[\u3040-\u309F\u30A0-\u30FF\u31F0-\u31FF\u3000-\u303F]/,
+  // ハングル完成字＋Jamo／互換ジャモ
+  ko: /[\uAC00-\uD7AF\u1100-\u11FF\u3130-\u318F\uA960-\uA97F\uD7B0-\uD7FF]/
 };
+
+// 全文字が１つのスクリプトだけに属するかチェックする「全マッチ用」正規表現
+const scriptFullRegexMap = Object.fromEntries(
+  Object.entries(scriptRegexMap)
+    .map(([lang, rx]) => [
+      lang,
+      new RegExp(`^${rx.source}+$`)
+    ])
+);
+
+// ── 2. スクリプトだけで判定できるかを試す関数 ──
+function detectByScript(text) {
+  for (const [lang, fullRx] of Object.entries(scriptFullRegexMap)) {
+    if (fullRx.test(text)) {
+      return lang;
+    }
+  }
+  return null;
+}
+
+// ── 3. Gemini プロンプトを「未知言語」対応版に更新 ──
+
+// Gemini で主要言語を判定するための軽量で高速なエンドポイント
+function getFastLanguageDetectionEndpoint() {
+  return `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent`;
+}
+
+async function determinePrimaryLanguage(text, mother, learn) {
+  const apiKey = getLocalSetting('geminiApiKey');
+  const prompt = `
+次の【文】の言語は「${mother}」、 「${learn}」、またはそのいずれでもない（unknown）可能性があります。
+該当するものを以下の3択の中から**1つのみ**出力してください:
+1. "${mother}"
+2. "${learn}"
+3. "unknown"
+
+【文】
+${text}
+
+【ルール】
+※ 1と2の場合は言語コードのみで出力
+※ 補足・記号・引用なし
+※ なぜその選択肢を選んだのか聞かれても答えられる根拠を持つこと
+`;
+
+  try {
+    const res = await fetch(
+      `${getFastLanguageDetectionEndpoint()}?key=${apiKey}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: { maxOutputTokens: 5 }
+        })
+      }
+    );
+    if (!res.ok) throw new Error(await res.text());
+    const json = await res.json();
+    let raw = json?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    // 余分な文字を取り除き、2文字アルファベット or "unknown" を抽出
+    const m = raw.match(/\b([a-z]{2}|unknown)\b/);
+    return m ? m[1] : 'unknown';
+  } catch (e) {
+    console.error('Gemini 判定失敗:', e);
+    return 'unknown';
+  }
+}
+
+// ── 4. モーダル表示ヘルパー ──
+function showLanguageMismatchModal(mother, learn) {
+  alert(`入力は指定言語（${languageLabel(mother)}, ${languageLabel(learn)}）のいずれにも一致しません。`);
+}
 
 function languageLabel(code) {
   const locale = getLocalSetting('motherLang');
@@ -462,87 +537,29 @@ function languageLabel(code) {
   return dn.of(code) || code;
 }
 
-// 翻訳先に複数言語が含まれるかどうかを判定する関数
-function detectMultipleLangs(text) {
-  return Object.entries(scriptRegexMap)
-    .filter(([lang, regex]) => regex.test(text))
-    .map(([lang]) => lang);
-}
-
-// Gemini で主要言語を判定するための軽量で高速なエンドポイント
-function getFastLanguageDetectionEndpoint() {
-  return `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent`;
-}
-
-// Gemini で主要言語を判定する関数
-async function determinePrimaryLanguage(text, mother, learn) {
-  const apiKey = getLocalSetting('geminiApiKey');
-  const prompt = `
-あなたはプロの言語判定エンジンです。
-
-次の文は「${mother}」または「${learn}」のどちらかで書かれています。
-あなたの仕事は、どちらの言語が使われているかを判定し、**その言語コード（"${mother}" または "${learn}"）だけ**を出力することです。
-
-【文】
-${text}
-
-【出力形式】
-- 出力は言語コード **1語のみ**
-- 説明・補足・記号は一切不要
-- 例：en ✅、ja ✅、→ ja ❌、日本語 ❌、"en" ❌
-
-さあ、出力してください：
-`;
-
-  let textOut = null;
-
-  try {
-    const res = await fetch(`${getFastLanguageDetectionEndpoint()}?key=${apiKey}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: { maxOutputTokens: 5 }
-      })
-    });
-
-    if (!res.ok) {
-      const errText = await res.text();
-      console.error('❌ Gemini 言語判定API失敗:', res.status, errText);
-      return mother; // fallback
-    }
-
-    const json = await res.json();
-    const rawOut = json?.candidates?.[0]?.content?.parts?.[0]?.text;
-    textOut = typeof rawOut === 'string' ? rawOut.trim() : null;
-  } catch (err) {
-    console.error('❌ 言語判定中に例外:', err);
-    return mother; // fallback
-  }
-
-  if ([mother, learn].includes(textOut)) {
-    return textOut;
-  } else {
-    console.warn(`⚠️ Gemini から予期しない言語コードが返されました: "${textOut}" → "${mother}" にフォールバックします`);
-    return mother;
-  }
-
-}
-
+// ── 5. 最終的な判定フロー ──
 async function detectLangs(text) {
   const mother = getLocalSetting('motherLang');
-  const learn = getLocalSetting('learnLang');
+  const learn  = getLocalSetting('learnLang');
 
-  const matchedLangs = Object.entries(scriptRegexMap)
-    .filter(([_, regex]) => regex.test(text))
-    .map(([lang]) => lang);
+  // ① 全文スクリプト一致なら即判定
+  const scriptLang = detectByScript(text);
+  let src = scriptLang;
 
-  let src;
-  if (matchedLangs.length === 1) {
-    src = matchedLangs[0]; // ← ひらがなのみ or ハングルのみなど、他の言語の要素がない場合のみ
-  } else {
-    // 複数マッチ or 上記のいずれにもマッチしない → Gemini で判定
-    src = await determinePrimaryLanguage(text, mother, learn);
+  // ② 一致しても想定外言語なら unknown 扱い
+  if (src && ![mother, learn].includes(src)) {
+    showLanguageMismatchModal(mother, learn);
+    return null;
+  }
+
+  // ③ スクリプトで判断できなかった場合 → Gemini 判定へ
+  if (!src) {
+    const out = await determinePrimaryLanguage(text, mother, learn);
+    if (out === 'unknown') {
+      showLanguageMismatchModal(mother, learn);
+      return null;
+    }
+    src = out;
   }
 
   const tgt = src === mother ? learn : mother;
@@ -556,13 +573,13 @@ function generatePrompt(text, src, mother, learn, context, enableExplanation) {
   const learnLabel  = languageLabel(learn);
   const directionDesc = `${toLabel}に翻訳・意訳した内容`;
 
-  let prompt = `あなたは、${motherLabel}を母語とするuserが、${learnLabel}を学ぶ為に設計された高性能翻訳アシスタントです。
+  let prompt = `あなたは、${motherLabel}を母語とするuserが、${learnLabel}を学ぶ為に設計された超高性能な翻訳機です。
 「翻訳元」とは、userが入力した${fromLabel}の内容。
 「翻訳先」とは、${directionDesc}。`;
 
   if (enableExplanation) {
     prompt += `
-「解説セクション」とは、翻訳先の内容を${motherLabel}を母語とする人たちに分かるように教えるセクション。`;
+「解説セクション」とは、${learnLabel}を学ぶ、${motherLabel}を母語とする人たちに向けた解説セクション。`;
   }
 
   // 補足文脈がある場合にのみ追加
@@ -580,7 +597,7 @@ ${context}`;
 
   if (enableExplanation) {
     prompt += `
-2. 解説セクションには、まず読み方や発音方法、詳細なニュアンスの説明、例文、類義語、対義語、${learnLabel}を母語とする人たちとの文化的背景の差異などを含めます。ただし、**${motherLabel}で**教えてください。`;
+2. 解説セクションには、その${learnLabel}について、読み方や発音方法、詳細なニュアンスの説明、例文、類義語、対義語、${learnLabel}を母語とする人たちとの文化的背景の差異などを含めます。ただし、**${motherLabel}で**教えてください。`;
   }
 
   // 出力制限セクション
@@ -606,6 +623,22 @@ ${text}`;
   }
 
   return prompt;
+}
+
+function resetTranslationUI() {
+  translationSection.innerHTML = `
+    <div id="translationPlaceholder" class="text-muted text-center py-5">
+      ${t('translationPlaceholder')}
+    </div>
+    <button id="copyTranslationBtn" class="btn btn-outline-primary btn-sm mt-2" style="display:none;">
+      Copy
+    </button>
+  `;
+  explanationSection.innerHTML = `
+    <div id="explanationPlaceholder" class="text-muted text-center py-5">
+      ${t('explanationPlaceholder')}
+    </div>
+  `;
 }
 
 translateBtn.addEventListener('click', async () => {
@@ -634,7 +667,13 @@ translateBtn.addEventListener('click', async () => {
   explanationSection.innerHTML = `<div class="text-muted text-center py-5">解説がここに表示されます</div>`;
 
   // ── ここから言語判定フロー ──
-  const { src, tgt } = await detectLangs(text);
+  const langResult = await detectLangs(text);
+  if (!langResult) {
+    resetTranslationUI();  // ← 初期状態に戻す
+    return;
+  }
+
+  const { src, tgt } = langResult;
 
   currentLangs = { src, tgt };
   srcInfo.textContent = `翻訳元（${languageLabel(src)}）`;
@@ -658,6 +697,7 @@ translateBtn.addEventListener('click', async () => {
       })
     });
     const json = await res.json();
+    console.log('🌐 翻訳APIレスポンス:', json);
     const out = json.candidates?.[0]?.content?.parts?.[0]?.text || '';
     const [partTrans, partExpl] = out.split(/解説セクション:/);
     const translationRaw = partTrans.replace(/^[\s\n]*翻訳先:\s*/i, '').trim();
