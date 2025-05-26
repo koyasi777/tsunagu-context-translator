@@ -314,5 +314,23 @@ export const i18nText = {
         zh: '译文：',
         ko: '번역:',
         de: 'Übersetzung:'
+    },
+    apiInfoLine1: {
+        ja: 'この翻訳アプリは<br><strong>GoogleのGemini APIキーの設定が必要です（無料）</strong>',
+        en: 'This translation app requires a <strong>Google Gemini API key (free)</strong>.',
+        es: 'Esta app de traducción requiere una <strong>clave de API de Google Gemini (gratuita)</strong>.',
+        fr: 'Cette application de traduction nécessite une <strong>clé API Google Gemini (gratuite)</strong>.',
+        zh: '本翻译应用需要一个<strong>免费的 Google Gemini API 密钥</strong>。',
+        ko: '이 번역 앱은 <strong>Google Gemini API 키(무료)</strong>가 필요합니다.',
+        de: 'Diese Übersetzungs-App benötigt einen <strong>kostenlosen Google Gemini API-Schlüssel</strong>.'
+    },
+    apiInfoLine2: {
+        ja: 'Google AI Studioの公式ページ にアクセスし、<br>取得したAPIキーを下の入力欄に貼り付けてください。',
+        en: 'Visit the <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer">Google AI Studio page</a> and paste your API key into the field below.',
+        es: 'Visita la <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer">página oficial de Google AI Studio</a> y pega tu clave API en el campo de abajo.',
+        fr: 'Accédez à la <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer">page officielle de Google AI Studio</a> et collez votre clé API ci-dessous.',
+        zh: '请访问 <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer">Google AI Studio 官方页面</a>，然后将 API 密钥粘贴到下方输入框中。',
+        ko: '<a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer">Google AI Studio 공식 페이지</a>를 방문하고 API 키를 아래 입력란에 붙여넣으세요.',
+        de: 'Besuchen Sie die <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer">offizielle Google AI Studio-Seite</a> und fügen Sie den API-Schlüssel unten ein.'
     }
 };
