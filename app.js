@@ -1,9 +1,75 @@
+// === Imports ===
 import { languageCodes } from './languages.js';
+import { i18nText } from './i18n.js';
 
-// IndexedDB 初期化
+// === i18n関数 ===
+function t(key) {
+  const lang = getLocalSetting('motherLang') || 'en';
+  return i18nText[key]?.[lang] || i18nText[key]?.['en'] || key;
+}
+
+// === IndexedDB 初期化 ===
 const DB_NAME = 'translator-db';
 const STORE_NAME = 'translations';
 let db;
+
+function updateLanguageLabels() {
+  // 母語・学習言語
+  const motherLangLabel1 = document.querySelector('label[for="navMotherLang"]');
+  const learnLangLabel1 = document.querySelector('label[for="navLearnLang"]');
+  const motherLangLabel2 = document.querySelector('label[for="modalMotherLang"]');
+  const learnLangLabel2 = document.querySelector('label[for="modalLearnLang"]');
+
+  if (motherLangLabel1) motherLangLabel1.textContent = t('motherLang');
+  if (learnLangLabel1)  learnLangLabel1.textContent  = t('learnLang');
+  if (motherLangLabel2) motherLangLabel2.textContent = t('motherLang');
+  if (learnLangLabel2)  learnLangLabel2.textContent  = t('learnLang');
+
+  // 翻訳元・翻訳先
+  const srcLabel = document.getElementById('srcInfo');
+  const tgtLabel = document.getElementById('tgtInfo');
+  if (srcLabel) srcLabel.textContent = t('srcLabel');
+  if (tgtLabel) tgtLabel.textContent = t('tgtLabel');
+
+  // 解説モードトグル
+  const explainToggleLabel = document.querySelector('label[for="explainModeToggle"]');
+  if (explainToggleLabel) explainToggleLabel.textContent = t('explainMode');
+
+  // ボタン類
+  const translateBtn = document.getElementById('translateBtn');
+  const toggleContextBtn = document.getElementById('toggleContextBtn');
+  const saveBtn = document.getElementById('saveBtn');
+
+  if (translateBtn) translateBtn.textContent = t('translateButton');
+
+  // 文脈トグル：状態によってボタンテキストが変化するため、再設定用関数を分けてもよい
+  if (toggleContextBtn) {
+    const isVisible = !document.getElementById('contextContainer').classList.contains('d-none');
+    toggleContextBtn.innerHTML = isVisible
+      ? `<i class="bi bi-dash-lg me-1"></i>${t('removeContext')}`
+      : `<i class="bi bi-plus-lg me-1"></i>${t('addContext')}`;
+  }
+
+  if (saveBtn) saveBtn.innerHTML = t('bookmark');
+
+  // プレースホルダー＆初期表示テキスト
+  const inputText = document.getElementById('inputText');
+  if (inputText) inputText.placeholder = t('inputPlaceholder');
+
+  const translationPlaceholderEl = document.getElementById('translationPlaceholder');
+  if (translationPlaceholderEl) {
+    translationPlaceholderEl.textContent = t('translationPlaceholder');
+  }
+
+  const explanationPlaceholderEl = document.getElementById('explanationPlaceholder');
+  if (explanationPlaceholderEl) {
+    explanationPlaceholderEl.textContent = t('explanationPlaceholder');
+  }
+
+  const contextText = document.getElementById('contextText');
+  if (contextText) contextText.placeholder = t('contextPlaceholder');
+
+}
 
 /**
  * 動的に言語選択肢を生成する
@@ -11,16 +77,51 @@ let db;
  * @param {string} currentValue
  */
 function populateLanguageSelect(selectEl, currentValue) {
-  const userLocale = getLocalSetting('motherLang'); // 母語をロケールに使う
+  const userLocale = getLocalSetting('motherLang');
   const dn = new Intl.DisplayNames([userLocale], { type: 'language' });
   selectEl.innerHTML = '';
-  languageCodes.forEach(code => {
+
+  // 頻出言語コード（世界の主要言語）
+  const frequentLanguages = [
+    'en', 'zh', 'es', 'hi', 'ar', 'bn',
+    'pt', 'ru', 'ja', 'de', 'fr', 'ko'
+  ];
+
+  const frequent = frequentLanguages.map(code => ({
+    code,
+    label: dn.of(code) || code
+  }));
+
+  const others = languageCodes
+    .filter(code => !frequentLanguages.includes(code))
+    .map(code => ({
+      code,
+      label: dn.of(code) || code
+    }));
+
+  // 頻出言語グループ
+  const groupFrequent = document.createElement('optgroup');
+  groupFrequent.label = t('popularLanguages');
+  frequent.forEach(({ code, label }) => {
     const opt = document.createElement('option');
     opt.value = code;
-    opt.textContent = dn.of(code) || code;
+    opt.textContent = label;
     if (code === currentValue) opt.selected = true;
-    selectEl.append(opt);
+    groupFrequent.appendChild(opt);
   });
+  selectEl.appendChild(groupFrequent);
+
+  // その他言語グループ
+  const groupOthers = document.createElement('optgroup');
+  groupOthers.label = t('otherLanguages');
+  others.forEach(({ code, label }) => {
+    const opt = document.createElement('option');
+    opt.value = code;
+    opt.textContent = label;
+    if (code === currentValue) opt.selected = true;
+    groupOthers.appendChild(opt);
+  });
+  selectEl.appendChild(groupOthers);
 }
 
 function openDb() {
@@ -164,8 +265,8 @@ toggleContextBtn.addEventListener('click', () => {
 
   contextContainer.classList.toggle('d-none');
   toggleContextBtn.innerHTML = willBeVisible
-    ? '<i class="bi bi-dash-lg me-1"></i>文脈を削除'
-    : '<i class="bi bi-plus-lg me-1"></i>文脈を追加';
+    ? `<i class="bi bi-dash-lg me-1"></i>${t('removeContext')}`
+    : `<i class="bi bi-plus-lg me-1"></i>${t('addContext')}`;
 
   localStorage.setItem('contextEnabled', String(willBeVisible));
 });
@@ -663,6 +764,9 @@ importJsonBtn.addEventListener('click', () => {
 
 (async () => {
   await openDb();
+
+  // ラベル多言語対応
+  updateLanguageLabels();
 
   // ★ 言語セレクトを動的に生成
   populateLanguageSelect(navMotherLang,   getLocalSetting('motherLang'));
