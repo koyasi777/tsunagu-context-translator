@@ -1,9 +1,9 @@
 {
-    "name": "Translator Tsunagu For You",
-    "short_name": "Tsunagu4u",
+    "name": "Tsunagu – The Context Translator",
+    "short_name": "Tsunagu",
     "description": "文脈に強いAI翻訳・語学学習アプリ",
-    "start_url": "/Translator-Tsunagu-For-You/?utm_source=homescreen",
-    "scope": "/Translator-Tsunagu-For-You/",
+    "start_url": "./?utm_source=homescreen",
+    "scope": "./",
     "display": "standalone",
     "background_color": "#ffffff",
     "theme_color": "#3069a6",
@@ -11,12 +11,12 @@
     "categories": ["education", "productivity"],
     "icons": [
         {
-        "src": "/Translator-Tsunagu-For-You/icons/icon-192x192.png",
+        "src": "./icons/icon-192x192.png",
         "sizes": "192x192",
         "type": "image/png"
         },
         {
-        "src": "/Translator-Tsunagu-For-You/icons/icon-512x512.png",
+        "src": "./icons/icon-512x512.png",
         "sizes": "512x512",
         "type": "image/png"
         }
