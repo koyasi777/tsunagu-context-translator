@@ -69,6 +69,56 @@ function updateLanguageLabels() {
   const contextText = document.getElementById('contextText');
   if (contextText) contextText.placeholder = t('contextPlaceholder');
 
+  document.querySelector('#apiKeyModal .modal-title').textContent = t('modalApiKeyTitle');
+  document.querySelector('#mobileLangModal .modal-title').textContent = t('modalLangTitle');
+  document.querySelector('#modelSettingModal .modal-title').textContent = t('modalModelTitle');
+
+  const bookmarkTitle = document.getElementById('bookmarkTitle');
+  if (bookmarkTitle) bookmarkTitle.textContent = t('bookmarkTitle');
+
+  const labelOriginal = document.getElementById('labelOriginal');
+  if (labelOriginal) labelOriginal.textContent = t('originalLabel');
+
+  const labelTranslated = document.getElementById('labelTranslated');
+  if (labelTranslated) labelTranslated.textContent = t('translatedLabel');
+
+  const labelContext = document.getElementById('labelContext');
+  if (labelContext) labelContext.textContent = t('contextLabel');
+
+  const labelExplanation = document.getElementById('labelExplanation');
+  if (labelExplanation) labelExplanation.textContent = t('explanationLabel');
+
+  // PCメニュー
+  const menuApiKey = document.querySelector('a[data-bs-target="#apiKeyModal"]');
+  const menuModel  = document.querySelector('a[data-bs-target="#modelSettingModal"]');
+  const menuBookmark = document.querySelector('a[data-bs-target="#bookmarkSidebar"]');
+
+  if (menuApiKey)    menuApiKey.textContent = t('menuApiKey');
+  if (menuModel)     menuModel.textContent  = t('menuModelSetting');
+  if (menuBookmark)  menuBookmark.textContent = t('menuBookmark');
+
+  // モバイルメニュー（ボタン形式）
+  const mobileLangBtn = document.querySelector('#mobileMenu button[data-bs-target="#mobileLangModal"]');
+  const mobileApiKeyBtn = document.querySelector('#mobileMenu button[data-bs-target="#apiKeyModal"]');
+  const mobileModelBtn = document.querySelector('#mobileMenu button[data-bs-target="#modelSettingModal"]');
+  const mobileBookmarkBtn = document.querySelector('#mobileMenu button[data-bs-target="#bookmarkSidebar"]');
+
+  if (mobileLangBtn)      mobileLangBtn.textContent = t('menuLangSetting');
+  if (mobileApiKeyBtn)    mobileApiKeyBtn.textContent = t('menuApiKey');
+  if (mobileModelBtn)     mobileModelBtn.textContent = t('menuModelSetting');
+  if (mobileBookmarkBtn)  mobileBookmarkBtn.textContent = t('menuBookmark');
+
+  const btnApiKeySave = document.getElementById('apiKeySaveBtn');
+  const btnLangSave   = document.getElementById('saveLangBtn');
+  const btnModelSave  = document.getElementById('saveModelBtn');
+
+  if (btnApiKeySave) btnApiKeySave.textContent = t('btnSave');
+  if (btnLangSave)   btnLangSave.textContent   = t('btnSave');
+  if (btnModelSave)  btnModelSave.textContent  = t('btnSave');
+
+  const modelLabel = document.querySelector('label[for="modelSelect"]');
+  if (modelLabel) modelLabel.textContent = t('modelSelectLabel');
+
 }
 
 /**
@@ -163,8 +213,8 @@ async function loadBookmarks() {
         <div class="d-flex justify-content-between align-items-start">
           <div>
             <small class="text-muted">${new Date(d.timestamp).toLocaleString()}</small>
-            <div><strong>原文:</strong> ${d.original}</div>
-            <div><strong>訳文:</strong> ${d.translated}</div>
+            <div><strong>${t('listOriginal')}</strong> ${d.original}</div>
+            <div><strong>${t('listTranslated')}</strong> ${d.translated}</div>
           </div>
           <button class="btn btn-sm btn-outline-danger ms-2" data-id="${d.id}">
             <i class="bi bi-trash"></i>
@@ -350,6 +400,7 @@ function updateLangSetting() {
 navMotherLang.addEventListener('change', () => {
   updateLangSetting();
   updateLanguageLabels();
+  loadBookmarks();
 });
 
 navLearnLang.addEventListener('change', updateLangSetting);
@@ -387,6 +438,7 @@ saveLangBtn.addEventListener('click', () => {
   navLearnLang.value  = learn;
 
   updateLanguageLabels();
+  loadBookmarks();
 
   // モーダルを閉じる
   bootstrap.Modal.getInstance(document.getElementById('mobileLangModal')).hide();
@@ -561,7 +613,7 @@ translateBtn.addEventListener('click', async () => {
   // APIキーが無効 or 空ならモーダル表示＋エラーメッセージ
   if (!apiKey || apiKey.length < 10) {
     const errorBox = document.getElementById('apiKeyError');
-    errorBox.textContent = '⚠️ APIキーが未設定または不正です。設定してください。';
+    errorBox.textContent = t('errorApiKeyMissing');
     errorBox.style.display = 'block';
 
     const modalEl = document.getElementById('apiKeyModal');
@@ -671,7 +723,7 @@ saveBtn.addEventListener('click', async () => {
     const toast = bootstrap.Toast.getOrCreateInstance(toastEl);
 
     // 警告メッセージに変更して表示
-    toastBody.textContent = '⚠️ 翻訳がまだ実行されていません。先に「翻訳する」ボタンを押してください。';
+    toastBody.textContent = t('toastTranslationNotDone');
     toastEl.classList.remove('bg-success');
     toastEl.classList.add('bg-warning');
     toast.show();
@@ -679,7 +731,7 @@ saveBtn.addEventListener('click', async () => {
     // 一定時間後に内容と背景色を戻す ＋ トーストを明示的に非表示にする
     setTimeout(() => {
       toast.hide(); // 🔁 明示的に非表示
-      toastBody.textContent = '📚 ブックマークに追加しました！';
+      toastBody.textContent = t('toastBookmarkAdded');
       toastEl.classList.remove('bg-warning');
       toastEl.classList.add('bg-success');
     }, 3000);
