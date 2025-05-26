@@ -1,4 +1,4 @@
-const CACHE_NAME = 'translator-cache-v5.4';
+const CACHE_NAME = 'translator-cache-v5.5';
 const ASSETS = [
     './index.html',
     './app.js',
