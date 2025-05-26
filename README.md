@@ -1,9 +1,9 @@
-# 🌐 Translator Tsunagu For You  
+# 🌐 Tsunagu – The Context Translator
 **A translation app focused on language learning, with natural, context-aware output and detailed explanations in your native language.**  
 Unlike typical AI translators, it's designed to support deeper understanding and cross-cultural communication.
 
 <p align="center">
-  <img src="https://koyasi777.github.io/Translator-Tsunagu-For-You/ogp-image.png" alt="Translator Tsunagu For You OGP" width="100%" />
+  <img src="https://koyasi777.github.io/Translator-Tsunagu-For-You/ogp-image.png" alt="Tsunagu – The Context Translator OGP" width="100%" />
 </p>
 
 > 🇯🇵 日本語版READMEはこちら: [README.ja.md](./README.ja.md)
