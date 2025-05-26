@@ -1,4 +1,4 @@
-const CACHE_NAME = 'translator-cache-v3';
+const CACHE_NAME = 'translator-cache-v4';
 const ASSETS = [
     '/Translator-Tsunagu-For-You/',
     '/Translator-Tsunagu-For-You/index.html',
