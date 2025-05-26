@@ -231,13 +231,10 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
-        <p>
-          この翻訳アプリは<br><strong>GoogleのGemini APIキーの設定が必要です（無料）</strong>
-        </p>
+        <p id="apiInfoLine1"></p>
         <p>
           <i class="bi bi-info-circle-fill text-info me-1"></i>
-          <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer">Google AI Studioの公式ページ</a>
-          にアクセスし、<br>取得したAPIキーを下の入力欄に貼り付けてください。
+          <span id="apiInfoLine2"></span>
         </p>
         <p></p>
         <label class="form-label">🔑 Gemini API Key</label>
