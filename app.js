@@ -119,6 +119,11 @@ function updateLanguageLabels() {
   const modelLabel = document.querySelector('label[for="modelSelect"]');
   if (modelLabel) modelLabel.textContent = t('modelSelectLabel');
 
+  const apiInfoLine1 = document.getElementById('apiInfoLine1');
+  if (apiInfoLine1) apiInfoLine1.innerHTML = t('apiInfoLine1');
+
+  const apiInfoLine2 = document.getElementById('apiInfoLine2');
+  if (apiInfoLine2) apiInfoLine2.innerHTML = t('apiInfoLine2');
 }
 
 /**
