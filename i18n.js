@@ -134,5 +134,185 @@ export const i18nText = {
         zh: '输入上下文，例如场景或情况…',
         ko: '상황이나 장면 등 문맥을 입력하세요...',
         de: 'Geben Sie den Kontext ein, z. B. eine Situation oder Szene...'
+    },
+    modalApiKeyTitle: {
+        ja: 'APIキー設定',
+        en: 'API Key Settings',
+        es: 'Configuración de la API',
+        fr: 'Paramètres de la clé API',
+        zh: 'API 密钥设置',
+        ko: 'API 키 설정',
+        de: 'API-Schlüssel-Einstellungen'
+    },
+    modalLangTitle: {
+        ja: '言語設定',
+        en: 'Language Settings',
+        es: 'Configuración de idioma',
+        fr: 'Paramètres de langue',
+        zh: '语言设置',
+        ko: '언어 설정',
+        de: 'Spracheinstellungen'
+    },
+    modalModelTitle: {
+        ja: 'モデル設定',
+        en: 'Model Settings',
+        es: 'Configuración del modelo',
+        fr: 'Paramètres du modèle',
+        zh: '模型设置',
+        ko: '모델 설정',
+        de: 'Modelleinstellungen'
+    },
+    toastBookmarkAdded: {
+        ja: '📚 ブックマークに追加しました！',
+        en: '📚 Added to bookmarks!',
+        es: '📚 Añadido a marcadores!',
+        fr: '📚 Ajouté aux favoris!',
+        zh: '📚 已加入书签！',
+        ko: '📚 북마크에 추가되었습니다!',
+        de: '📚 Zu den Lesezeichen hinzugefügt!'
+    },
+    toastTranslationNotDone: {
+        ja: '⚠️ 翻訳がまだ実行されていません。先に「翻訳する」ボタンを押してください。',
+        en: '⚠️ Translation has not been executed yet. Please press the "Translate" button first.',
+        es: '⚠️ Aún no se ha realizado la traducción. Pulsa primero "Traducir".',
+        fr: '⚠️ La traduction n’a pas encore été effectuée. Cliquez sur "Traduire".',
+        zh: '⚠️ 尚未执行翻译。请先点击“翻译”按钮。',
+        ko: '⚠️ 번역이 아직 실행되지 않았습니다. 먼저 "번역하기" 버튼을 눌러주세요.',
+        de: '⚠️ Die Übersetzung wurde noch nicht ausgeführt. Bitte zuerst auf „Übersetzen“ klicken.'
+    },
+    errorApiKeyMissing: {
+        ja: '⚠️ APIキーが未設定または不正です。設定してください。',
+        en: '⚠️ API key is missing or invalid. Please configure it.',
+        es: '⚠️ Falta la clave de API o es inválida. Configúrala por favor.',
+        fr: '⚠️ La clé API est absente ou invalide. Veuillez la configurer.',
+        zh: '⚠️ API 密钥缺失或无效。请设置。',
+        ko: '⚠️ API 키가 누락되었거나 잘못되었습니다. 설정해 주세요.',
+        de: '⚠️ API-Schlüssel fehlt oder ist ungültig. Bitte konfigurieren.'
+    },
+    bookmarkTitle: {
+        ja: '📚 ブックマーク',
+        en: '📚 Bookmarks',
+        es: '📚 Marcadores',
+        fr: '📚 Favoris',
+        zh: '📚 书签',
+        ko: '📚 북마크',
+        de: '📚 Lesezeichen'
+    },
+    bookmarkSettingsButton: {
+        ja: '設定',
+        en: 'Settings',
+        es: 'Configuración',
+        fr: 'Paramètres',
+        zh: '设置',
+        ko: '설정',
+        de: 'Einstellungen'
+    },
+    originalLabel: {
+        ja: '原文:',
+        en: 'Original:',
+        es: 'Texto original:',
+        fr: 'Texte original :',
+        zh: '原文：',
+        ko: '원문:',
+        de: 'Ausgangstext:'
+    },
+    translatedLabel: {
+        ja: '訳文:',
+        en: 'Translation:',
+        es: 'Traducción:',
+        fr: 'Traduction :',
+        zh: '译文：',
+        ko: '번역:',
+        de: 'Übersetzung:'
+    },
+    contextLabel: {
+        ja: '文脈:',
+        en: 'Context:',
+        es: 'Contexto:',
+        fr: 'Contexte :',
+        zh: '上下文：',
+        ko: '문맥:',
+        de: 'Kontext:'
+    },
+    explanationLabel: {
+        ja: '解説セクション:',
+        en: 'Explanation:',
+        es: 'Explicación:',
+        fr: 'Explication :',
+        zh: '解说部分：',
+        ko: '해설 섹션:',
+        de: 'Erläuterung:'
+    },
+    menuApiKey: {
+        ja: '🔑 APIキー設定',
+        en: '🔑 API Key',
+        es: '🔑 Clave API',
+        fr: '🔑 Clé API',
+        zh: '🔑 API密钥',
+        ko: '🔑 API 키',
+        de: '🔑 API-Schlüssel'
+    },
+    menuModelSetting: {
+        ja: '🛠️ モデル設定',
+        en: '🛠️ Model Settings',
+        es: '🛠️ Configuración de modelo',
+        fr: '🛠️ Paramètres du modèle',
+        zh: '🛠️ 模型设置',
+        ko: '🛠️ 모델 설정',
+        de: '🛠️ Modelleinstellungen'
+    },
+    menuBookmark: {
+        ja: '📚 ブックマーク',
+        en: '📚 Bookmarks',
+        es: '📚 Marcadores',
+        fr: '📚 Favoris',
+        zh: '📚 书签',
+        ko: '📚 북마크',
+        de: '📚 Lesezeichen'
+    },
+    menuLangSetting: {
+        ja: '⚙️ 言語設定',
+        en: '⚙️ Language Settings',
+        es: '⚙️ Configuración de idioma',
+        fr: '⚙️ Paramètres de langue',
+        zh: '⚙️ 语言设置',
+        ko: '⚙️ 언어 설정',
+        de: '⚙️ Spracheinstellungen'
+    },
+    btnSave: {
+        ja: '保存',
+        en: 'Save',
+        es: 'Guardar',
+        fr: 'Enregistrer',
+        zh: '保存',
+        ko: '저장',
+        de: 'Speichern'
+    },
+    modelSelectLabel: {
+        ja: '使用するGeminiモデルを選択:',
+        en: 'Select Gemini model to use:',
+        es: 'Selecciona el modelo de Gemini:',
+        fr: 'Sélectionnez le modèle Gemini à utiliser :',
+        zh: '选择要使用的 Gemini 模型：',
+        ko: '사용할 Gemini 모델 선택:',
+        de: 'Wählen Sie das zu verwendende Gemini-Modell:'
+    },
+    listOriginal: {
+        ja: '原文:',
+        en: 'Original:',
+        es: 'Texto original:',
+        fr: 'Texte original :',
+        zh: '原文：',
+        ko: '원문:',
+        de: 'Ausgangstext:'
+    },
+    listTranslated: {
+        ja: '訳文:',
+        en: 'Translation:',
+        es: 'Traducción:',
+        fr: 'Traduction :',
+        zh: '译文：',
+        ko: '번역:',
+        de: 'Übersetzung:'
     }
 };
