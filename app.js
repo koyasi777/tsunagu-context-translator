@@ -347,7 +347,11 @@ function updateLangSetting() {
   localStorage.setItem('learnLang', navLearnLang.value);
 }
 
-navMotherLang.addEventListener('change', updateLangSetting);
+navMotherLang.addEventListener('change', () => {
+  updateLangSetting();
+  updateLanguageLabels();
+});
+
 navLearnLang.addEventListener('change', updateLangSetting);
 
 apiKeySaveBtn.addEventListener('click', () => {
@@ -381,6 +385,8 @@ saveLangBtn.addEventListener('click', () => {
   // ナビゲーションのセレクトにも反映（デスクトップ表示用）
   navMotherLang.value = mother;
   navLearnLang.value  = learn;
+
+  updateLanguageLabels();
 
   // モーダルを閉じる
   bootstrap.Modal.getInstance(document.getElementById('mobileLangModal')).hide();
