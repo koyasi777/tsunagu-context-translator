@@ -566,15 +566,16 @@ translateBtn.addEventListener('click', async () => {
 
   if (!text) return;
 
+  // 翻訳を開始する直前にスピナーを表示
+  translationSection.innerHTML = `<div class="text-center py-5"><div class="spinner-border"></div></div>`;
+  explanationSection.innerHTML = `<div class="text-muted text-center py-5">解説がここに表示されます</div>`;
+
   // ── ここから言語判定フロー ──
   const { src, tgt } = await detectLangs(text);
 
   currentLangs = { src, tgt };
   srcInfo.textContent = `翻訳元（${languageLabel(src)}）`;
   tgtInfo.textContent = `翻訳先（${languageLabel(tgt)}）`;
-
-  translationSection.innerHTML = `<div class="text-center py-5"><div class="spinner-border"></div></div>`;
-  explanationSection.innerHTML = `<div class="text-muted text-center py-5">解説がここに表示されます</div>`;
 
   try {
     // ① トグル状態取得
