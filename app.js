@@ -1,7 +1,27 @@
+import { languageCodes } from './languages.js';
+
 // IndexedDB 初期化
 const DB_NAME = 'translator-db';
 const STORE_NAME = 'translations';
 let db;
+
+/**
+ * 動的に言語選択肢を生成する
+ * @param {HTMLSelectElement} selectEl
+ * @param {string} currentValue
+ */
+function populateLanguageSelect(selectEl, currentValue) {
+  const userLocale = getLocalSetting('motherLang'); // 母語をロケールに使う
+  const dn = new Intl.DisplayNames([userLocale], { type: 'language' });
+  selectEl.innerHTML = '';
+  languageCodes.forEach(code => {
+    const opt = document.createElement('option');
+    opt.value = code;
+    opt.textContent = dn.of(code) || code;
+    if (code === currentValue) opt.selected = true;
+    selectEl.append(opt);
+  });
+}
 
 function openDb() {
   return new Promise((resolve, reject) => {
@@ -204,7 +224,21 @@ let currentLangs = {};
 let currentExplanationRaw = '';
 
 function getLocalSetting(key, fallback = '') {
-  return localStorage.getItem(key) || fallback;
+  const stored = localStorage.getItem(key);
+  if (stored !== null) return stored;
+
+  // 初期値が 'motherLang' または 'learnLang' の場合
+  if (key === 'motherLang') {
+    const browserLang = navigator.language.slice(0, 2);
+    return languageCodes.includes(browserLang) ? browserLang : 'en';
+  }
+  if (key === 'learnLang') {
+    const mother = getLocalSetting('motherLang');
+    // 違う言語をデフォルト学習言語に（英語ユーザーには日本語など）
+    return mother === 'en' ? 'ja' : 'en';
+  }
+
+  return fallback;
 }
 
 function updateLangSetting() {
@@ -233,8 +267,8 @@ const modalLearnLang  = document.getElementById('modalLearnLang');
 const saveLangBtn     = document.getElementById('saveLangBtn');
 
 // 初期表示：ローカルストレージから取得してモーダルのセレクトを反映
-modalMotherLang.value = getLocalSetting('motherLang', 'ja');
-modalLearnLang.value  = getLocalSetting('learnLang', 'en');
+modalMotherLang.value = getLocalSetting('motherLang');
+modalLearnLang.value  = getLocalSetting('learnLang');
 
 // 保存ボタン押下時の処理（モーダル内）
 saveLangBtn.addEventListener('click', () => {
@@ -252,19 +286,16 @@ saveLangBtn.addEventListener('click', () => {
 });
 
 const scriptRegexMap = {
-  ja: /[\u3040-\u30ff\u31f0-\u31ff\u4e00-\u9faf]/,
-  ko: /[\uac00-\ud7af]/,
-  en: /[A-Za-z]/,
-  zh: /[\u4e00-\u9fff]/,
-  fr: /[A-Za-zàâçéèêëîïôûùüÿñæœ]/i,
-  de: /[A-Za-zäöüß]/i
+  // ひらがな・カタカナがあれば日本語とみなす
+  ja: /[\u3040-\u30ff\u31f0-\u31ff]/,
+  // ハングルがあれば韓国語とみなす
+  ko: /[\uac00-\ud7af]/
 };
 
 function languageLabel(code) {
-  const labels = {
-    ja: '日本語', ko: '한국어', en: '英語', zh: '中国語', fr: 'フランス語', de: 'ドイツ語'
-  };
-  return labels[code] || code;
+  const locale = getLocalSetting('motherLang');
+  const dn = new Intl.DisplayNames([locale], { type: 'language' });
+  return dn.of(code) || code;
 }
 
 // 翻訳先に複数言語が含まれるかどうかを判定する関数
@@ -280,39 +311,76 @@ function getFastLanguageDetectionEndpoint() {
 }
 
 // Gemini で主要言語を判定する関数
-async function determinePrimaryLanguage(text) {
+async function determinePrimaryLanguage(text, mother, learn) {
   const apiKey = getLocalSetting('geminiApiKey');
   const prompt = `
-次の文は複数言語が混在している可能性があります。
+あなたはプロの言語判定エンジンです。
+
+次の文は「${mother}」または「${learn}」のどちらかで書かれています。
+あなたの仕事は、どちらの言語が使われているかを判定し、**その言語コード（"${mother}" または "${learn}"）だけ**を出力することです。
 
 【文】
 ${text}
 
-この文全体を見て、主にどの言語で書かれているか、言語コード（ja, en, ko, zh, fr, de）で答えてください。
+【出力形式】
+- 出力は言語コード **1語のみ**
+- 説明・補足・記号は一切不要
+- 例：en ✅、ja ✅、→ ja ❌、日本語 ❌、"en" ❌
+
+さあ、出力してください：
 `;
-  const res = await fetch(`${getFastLanguageDetectionEndpoint()}?key=${apiKey}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      contents: [{ parts: [{ text: prompt }] }],
-      generationConfig: { maxOutputTokens: 10 }
-    })
-  });
-  const json = await res.json();
-  const langName = json.candidates?.[0]?.content?.parts?.[0]?.text.trim();
-  const codeMap = {
-    日本語: 'ja', 英語: 'en', 한국어: 'ko',
-    中国語: 'zh', フランス語: 'fr', ドイツ語: 'de',
-    ja: 'ja', en: 'en', ko: 'ko', zh: 'zh', fr: 'fr', de: 'de'
-  };
-  return codeMap[langName] || getLocalSetting('motherLang', 'ja');
+
+  let textOut = null;
+
+  try {
+    const res = await fetch(`${getFastLanguageDetectionEndpoint()}?key=${apiKey}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { maxOutputTokens: 5 }
+      })
+    });
+
+    if (!res.ok) {
+      const errText = await res.text();
+      console.error('❌ Gemini 言語判定API失敗:', res.status, errText);
+      return mother; // fallback
+    }
+
+    const json = await res.json();
+    const rawOut = json?.candidates?.[0]?.content?.parts?.[0]?.text;
+    textOut = typeof rawOut === 'string' ? rawOut.trim() : null;
+  } catch (err) {
+    console.error('❌ 言語判定中に例外:', err);
+    return mother; // fallback
+  }
+
+  if ([mother, learn].includes(textOut)) {
+    return textOut;
+  } else {
+    console.warn(`⚠️ Gemini から予期しない言語コードが返されました: "${textOut}" → "${mother}" にフォールバックします`);
+    return mother;
+  }
+
 }
 
-function detectLangs(text) {
-  const mother = getLocalSetting('motherLang', 'ja');
-  const learn = getLocalSetting('learnLang', 'en');
-  let src = mother;
-  if (scriptRegexMap[learn]?.test(text)) src = learn;
+async function detectLangs(text) {
+  const mother = getLocalSetting('motherLang');
+  const learn = getLocalSetting('learnLang');
+
+  const matchedLangs = Object.entries(scriptRegexMap)
+    .filter(([_, regex]) => regex.test(text))
+    .map(([lang]) => lang);
+
+  let src;
+  if (matchedLangs.length === 1) {
+    src = matchedLangs[0]; // ← ひらがなのみ or ハングルのみなど、他の言語の要素がない場合のみ
+  } else {
+    // 複数マッチ or 上記のいずれにもマッチしない → Gemini で判定
+    src = await determinePrimaryLanguage(text, mother, learn);
+  }
+
   const tgt = src === mother ? learn : mother;
   return { src, tgt };
 }
@@ -378,8 +446,8 @@ ${text}`;
 
 translateBtn.addEventListener('click', async () => {
   const apiKey = getLocalSetting('geminiApiKey');
-  const mother = getLocalSetting('motherLang', 'ja');
-  const learn = getLocalSetting('learnLang', 'en');
+  const mother = getLocalSetting('motherLang');
+  const learn = getLocalSetting('learnLang');
   const text = inputText.value.trim();
   const context = !contextContainer.classList.contains('d-none') ? contextText.value.trim() : '';
 
@@ -398,17 +466,7 @@ translateBtn.addEventListener('click', async () => {
   if (!text) return;
 
   // ── ここから言語判定フロー ──
-  const langsDetected = detectMultipleLangs(text);
-  let src, tgt;
-
-  if (langsDetected.length === 1) {
-    // 単一言語 → 既存ロジック
-    ({ src, tgt } = detectLangs(text));
-  } else {
-    // 多言語混在 → Gemini に主要言語を判定させる
-    src = await determinePrimaryLanguage(text);
-    tgt = src === mother ? learn : mother;
-  }
+  const { src, tgt } = await detectLangs(text);
 
   currentLangs = { src, tgt };
   srcInfo.textContent = `翻訳元（${languageLabel(src)}）`;
@@ -605,9 +663,14 @@ importJsonBtn.addEventListener('click', () => {
 
 (async () => {
   await openDb();
+
+  // ★ 言語セレクトを動的に生成
+  populateLanguageSelect(navMotherLang,   getLocalSetting('motherLang'));
+  populateLanguageSelect(navLearnLang,    getLocalSetting('learnLang'));
+  populateLanguageSelect(modalMotherLang, getLocalSetting('motherLang'));
+  populateLanguageSelect(modalLearnLang,  getLocalSetting('learnLang'));
+
   apiKeyInput.value = getLocalSetting('geminiApiKey');
-  navMotherLang.value = getLocalSetting('motherLang', 'ja');
-  navLearnLang.value = getLocalSetting('learnLang', 'en');
   loadBookmarks();
 
   if (!getLocalSetting('geminiApiKey')) {
