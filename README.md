@@ -3,7 +3,7 @@
 Unlike typical AI translators, it's designed to support deeper understanding and cross-cultural communication.
 
 <p align="center">
-  <img src="https://koyasi777.github.io/Translator-Tsunagu-For-You/ogp-image.png" alt="Tsunagu – The Context Translator OGP" width="100%" />
+  <img src="https://koyasi777.github.io/tsunagu-context-translator/ogp-image.png" alt="Tsunagu – The Context Translator OGP" width="100%" />
 </p>
 
 > 🇯🇵 日本語版READMEはこちら: [README.ja.md](./README.ja.md)
@@ -40,7 +40,7 @@ Unlike typical AI translators, it's designed to support deeper understanding and
 
 ## 🔗 Try It Now (Access here 👇)
 
-▶︎ [https://koyasi777.github.io/Translator-Tsunagu-For-You](https://koyasi777.github.io/Translator-Tsunagu-For-You)
+▶︎ [https://koyasi777.github.io/tsunagu-context-translator](https://koyasi777.github.io/tsunagu-context-translator)
 
 ※ On first use, you’ll be asked to enter an API key for the translation service (free to obtain).
 
