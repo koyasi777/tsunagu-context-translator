@@ -575,18 +575,18 @@ function generatePrompt(text, src, mother, learn, context, enableExplanation) {
   const directionDesc = `${toLabel}に翻訳・意訳した内容`;
 
   let prompt = `あなたは、${motherLabel}を母語とするuserが、${learnLabel}を学ぶ為に設計された超高性能な翻訳機です。
-「翻訳元」とは、userが入力した${fromLabel}の内容。
-「翻訳先」とは、${directionDesc}。`;
+「Source」とは、userが入力した${fromLabel}の内容。
+「Translation」とは、${directionDesc}。`;
 
   if (enableExplanation) {
     prompt += `
-「解説セクション」とは、${learnLabel}を学ぶ、${motherLabel}を母語とする人たちに向けた解説セクション。`;
+「Explanation」とは、${learnLabel}を学ぶ、${motherLabel}を母語とする人たちに向けた${motherLabel}による解説。`;
   }
 
   // 補足文脈がある場合にのみ追加
   if (context) {
     prompt += `
-【シチュエーション/文脈】
+【Context】
 ${context}`;
   }
 
@@ -594,11 +594,11 @@ ${context}`;
 
 以下を実行してください：
 
-1. シチュエーションに沿った自然な${toLabel}に翻訳・意訳してください。`;
+1. 「Translation」にContextに沿った自然な${toLabel}に翻訳・意訳を出力してください。`;
 
   if (enableExplanation) {
     prompt += `
-2. 解説セクションには、その${learnLabel}について、読み方や発音方法、詳細なニュアンスの説明、例文、類義語、対義語、${learnLabel}を母語とする人たちとの文化的背景の差異などを含めます。ただし、**${motherLabel}で**教えてください。`;
+2. 「Explanation」には、その**${learnLabel}について**、読み方や発音方法、詳細なニュアンスの説明、例文、類義語、対義語、${learnLabel}を母語とする人たちとの文化的背景の差異などを含めます。ただし、**${motherLabel}で**教えてください。`;
   }
 
   // 出力制限セクション
@@ -606,20 +606,20 @@ ${context}`;
 
 ※出力制限
 - 返事はせずに以下のフォーマットに沿って出力
-- **${context ? '「翻訳元」や「シチュエーション/文脈」の内容を繰り返し出力しない' : '「翻訳元」の内容を繰り返し出力しない'}**`;
+- **${context ? '「Source」や「Context」の内容を繰り返し出力しない' : '「Source」の内容を繰り返し出力しない'}**`;
 
   // 翻訳先と解説セクション
   if (enableExplanation) {
     prompt += `
 
-翻訳先:
+Translation:
 ${text}
 
-解説セクション:`;
+Explanation:`;
   } else {
     prompt += `
 
-翻訳先:
+Translation:
 ${text}`;
   }
 
@@ -677,8 +677,8 @@ translateBtn.addEventListener('click', async () => {
   const { src, tgt } = langResult;
 
   currentLangs = { src, tgt };
-  srcInfo.textContent = `翻訳元（${languageLabel(src)}）`;
-  tgtInfo.textContent = `翻訳先（${languageLabel(tgt)}）`;
+  srcInfo.textContent = `${t('srcLabel')}（${languageLabel(src)}）`;
+  tgtInfo.textContent = `${t('tgtLabel')}（${languageLabel(tgt)}）`;
 
   try {
     // ① トグル状態取得
@@ -700,8 +700,8 @@ translateBtn.addEventListener('click', async () => {
     const json = await res.json();
     console.log('🌐 翻訳APIレスポンス:', json);
     const out = json.candidates?.[0]?.content?.parts?.[0]?.text || '';
-    const [partTrans, partExpl] = out.split(/解説セクション:/);
-    const translationRaw = partTrans.replace(/^[\s\n]*翻訳先:\s*/i, '').trim();
+    const [partTrans, partExpl] = out.split(/Explanation:/);
+    const translationRaw = partTrans.replace(/^[\s\n]*Translation:\s*/i, '').trim();
     const explanationRaw = (partExpl || '').trim();
     currentExplanationRaw = explanationRaw;
 
