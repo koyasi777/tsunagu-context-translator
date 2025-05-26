@@ -330,7 +330,7 @@ contextText.addEventListener('input', () => {
 const GEMINI_MODELS = {
   'gemini-2.0-flash-lite': {
     id: 'gemini-2.0-flash-lite',
-    label: '🔹 Gemini 2.0 Flash-Lite（安定版）'
+    label: '🔹 Gemini 2.0 Flash-Lite（Default）'
   },
   'gemini-2.0-flash': {
     id: 'gemini-2.0-flash',
