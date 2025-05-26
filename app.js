@@ -487,17 +487,17 @@ function getFastLanguageDetectionEndpoint() {
 async function determinePrimaryLanguage(text, mother, learn) {
   const apiKey = getLocalSetting('geminiApiKey');
   const prompt = `
-次の【文】の言語は「${mother}」、 「${learn}」、またはそのいずれでもない（unknown）可能性があります。
+次の【文】の言語は「${mother}」、「${learn}」、またはそのいずれでもない（unknown）可能性があります。
 該当するものを以下の3択の中から**1つのみ**出力してください:
-1. "${mother}"
-2. "${learn}"
-3. "unknown"
+- "${mother}"
+- "${learn}"
+- "unknown"
 
 【文】
 ${text}
 
 【ルール】
-※ 1と2の場合は言語コードのみで出力
+※ 「${mother}」「${learn}」の場合は**言語コード**のみで出力
 ※ 補足・記号・引用なし
 ※ なぜその選択肢を選んだのか聞かれても答えられる根拠を持つこと
 `;
@@ -516,6 +516,7 @@ ${text}
     );
     if (!res.ok) throw new Error(await res.text());
     const json = await res.json();
+    console.log('🌐 Gemini 言語判定レスポンス:', json);
     let raw = json?.candidates?.[0]?.content?.parts?.[0]?.text || '';
     // 余分な文字を取り除き、2文字アルファベット or "unknown" を抽出
     const m = raw.match(/\b([a-z]{2}|unknown)\b/);
