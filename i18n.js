@@ -325,7 +325,7 @@ export const i18nText = {
         de: 'Diese Übersetzungs-App benötigt einen <strong>kostenlosen Google Gemini API-Schlüssel</strong>.'
     },
     apiInfoLine2: {
-        ja: 'Google AI Studioの公式ページ にアクセスし、<br>取得したAPIキーを下の入力欄に貼り付けてください。',
+        ja: '<a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer">Google AI Studioの公式ページ</a> にアクセスし、<br>取得したAPIキーを下の入力欄に貼り付けてください。',
         en: 'Visit the <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer">Google AI Studio page</a> and paste your API key into the field below.',
         es: 'Visita la <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer">página oficial de Google AI Studio</a> y pega tu clave API en el campo de abajo.',
         fr: 'Accédez à la <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer">page officielle de Google AI Studio</a> et collez votre clé API ci-dessous.',
