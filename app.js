@@ -562,7 +562,7 @@ function generatePrompt(text, src, mother, learn, context, enableExplanation) {
 
   if (enableExplanation) {
     prompt += `
-「解説セクション」とは、翻訳先の内容を${motherLabel}で教えるセクション。`;
+「解説セクション」とは、翻訳先の内容を${motherLabel}を母語とする人たちに分かるように教えるセクション。`;
   }
 
   // 補足文脈がある場合にのみ追加
@@ -580,7 +580,7 @@ ${context}`;
 
   if (enableExplanation) {
     prompt += `
-2. 解説セクションには、まず読み方や発音方法、詳細なニュアンスの説明、例文、類義語、対義語、${learnLabel}を母語とする人たちとの文化的背景の差異などを含めて**${motherLabel}で**教えてください。`;
+2. 解説セクションには、まず読み方や発音方法、詳細なニュアンスの説明、例文、類義語、対義語、${learnLabel}を母語とする人たちとの文化的背景の差異などを含めます。ただし、**${motherLabel}で**教えてください。`;
   }
 
   // 出力制限セクション
