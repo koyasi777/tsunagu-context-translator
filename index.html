@@ -139,16 +139,16 @@
     </div>
     <div class="offcanvas-body">
       <button class="btn btn-outline-secondary w-100 mb-2" data-bs-toggle="modal" data-bs-target="#mobileLangModal">
-        <i class="bi bi-gear"></i> 言語設定
+        言語設定
       </button>
       <button class="btn btn-outline-secondary w-100 mb-2" data-bs-toggle="modal" data-bs-target="#apiKeyModal">
-        <i class="bi bi-key"></i> APIキー設定
+        🔑 APIキー設定
       </button>
       <button class="btn btn-outline-secondary w-100 mb-2" data-bs-toggle="modal" data-bs-target="#modelSettingModal">
-        <i class="bi bi-cpu"></i> モデル設定
+        🛠️ モデル設定
       </button>
       <button class="btn btn-outline-primary w-100 mb-2" data-bs-toggle="offcanvas" data-bs-target="#bookmarkSidebar">
-        <i class="bi bi-bookmarks"></i> ブックマーク
+        📚 ブックマーク
       </button>
     </div>
   </div>
@@ -208,7 +208,7 @@
   <!-- ブックマークサイドバー全体 -->
   <div class="offcanvas offcanvas-end" tabindex="-1" id="bookmarkSidebar">
     <div class="offcanvas-header d-flex justify-content-between align-items-center">
-      <h5 class="offcanvas-title mb-0 d-flex align-items-center">
+      <h5 id="bookmarkTitle" class="offcanvas-title mb-0 d-flex align-items-center">
         📚 ブックマーク
       </h5>
       <div class="d-flex align-items-center gap-2">
@@ -240,7 +240,7 @@
           にアクセスし、<br>取得したAPIキーを下の入力欄に貼り付けてください。
         </p>
         <p></p>
-        <label class="form-label">🔑 Gemini APIキー</label>
+        <label class="form-label">🔑 Gemini API Key</label>
         <input id="envApiKey" type="text" class="form-control" placeholder="APIキーを入力">
         <div id="apiKeyError" class="text-danger mt-2" style="display:none;"></div>
       </div>
@@ -324,16 +324,16 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
-        <p><strong>原文:</strong></p>
+        <p><strong id="labelOriginal">原文:</strong></p>
         <div id="modalOriginalText" class="border p-2 bg-light"></div>
         <hr>
-        <p><strong>訳文:</strong></p>
+        <p><strong id="labelTranslated">訳文:</strong></p>
         <div id="modalTranslatedText" class="border p-2 bg-white"></div>
         <hr>
-        <p><strong>文脈:</strong></p>
+        <p><strong id="labelContext">文脈:</strong></p>
         <div id="modalContextText" class="border p-2 bg-white"></div>
         <hr>
-        <p><strong>解説セクション:</strong></p>
+        <p><strong id="labelExplanation">解説セクション:</strong></p>
         <div id="modalExplanationText" class="border p-2 bg-white"></div>
       </div>
     </div></div>
