@@ -1,4 +1,4 @@
-const CACHE_NAME = 'translator-cache-v5.3';
+const CACHE_NAME = 'translator-cache-v5.4';
 const ASSETS = [
     './index.html',
     './app.js',
@@ -34,6 +34,6 @@ self.addEventListener('fetch', event => {
     event.respondWith(
         caches.match(event.request)
             .then(cached => cached || fetch(event.request))
-            .catch(() => caches.match('/Translator-Tsunagu-For-You/offline.html'))
+            .catch(() => caches.match('./offline.html'))
     );
 });
