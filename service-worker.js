@@ -1,12 +1,13 @@
-const CACHE_NAME = 'translator-cache-v4';
+const CACHE_NAME = 'translator-cache-v5';
 const ASSETS = [
-    '/Translator-Tsunagu-For-You/',
-    '/Translator-Tsunagu-For-You/index.html',
-    '/Translator-Tsunagu-For-You/app.js',
-    '/Translator-Tsunagu-For-You/manifest.json',
-    '/Translator-Tsunagu-For-You/icons/icon-192x192.png',
-    '/Translator-Tsunagu-For-You/icons/icon-512x512.png',
-    '/Translator-Tsunagu-For-You/offline.html'
+    './index.html',
+    './app.js',
+    './languages.js',
+    './i18n.js',
+    './manifest.json',
+    './icons/icon-192x192.png',
+    './icons/icon-512x512.png',
+    './offline.html'
 ];
 
 self.addEventListener('install', event => {
