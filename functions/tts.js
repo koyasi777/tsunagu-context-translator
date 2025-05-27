@@ -1,6 +1,8 @@
 export async function onRequestPost(context) {
+  console.log("✅ POST /api/tts called");
   try {
     const { text, voice, apiKey } = await context.request.json();
+    console.log("📦 Input parsed", { text, voice, apiKey });
 
     if (!apiKey || !text) {
       return new Response(JSON.stringify({ error: "Missing apiKey or text" }), {
@@ -53,6 +55,7 @@ export async function onRequestPost(context) {
     });
 
   } catch (err) {
+    console.error("🔥 TTS error:", err);
     return new Response(JSON.stringify({ error: "TTS API ERROR: " + err.message }), {
       status: 500,
       headers: { "Content-Type": "application/json" },
