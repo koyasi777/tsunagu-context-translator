@@ -1,3 +1,4 @@
 name = "tsunagu-context-translator"
-assets = { directory = "." }
 compatibility_date = "2025-05-27"
+main = "functions/api/tts.js"
+assets = { directory = "." }
