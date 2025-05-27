@@ -487,8 +487,7 @@ function getFastLanguageDetectionEndpoint() {
 async function determinePrimaryLanguage(text, mother, learn) {
   const apiKey = getLocalSetting('geminiApiKey');
   const prompt = `
-次の【文】の言語は「${mother}」、「${learn}」、またはそのいずれでもない（unknown）可能性があります。
-該当するものを以下の3択の中から**1つのみ**出力してください:
+次の【文】の言語は「${mother}」、「${learn}」のいずれかです。ただ完全にいずれでもない（unknown）の場合もあります。該当するものを以下の3択の中から**1つのみ**出力してください:
 - "${mother}"
 - "${learn}"
 - "unknown"
@@ -499,7 +498,6 @@ ${text}
 【ルール】
 ※ 「${mother}」「${learn}」の場合は**言語コード**のみで出力
 ※ 補足・記号・引用なし
-※ なぜその選択肢を選んだのか聞かれても答えられる根拠を持つこと
 `;
 
   try {
