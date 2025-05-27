@@ -835,7 +835,7 @@ saveBtn.addEventListener('click', async () => {
  * Gemini TTS で音声を再生
  */
 async function playTTS(text) {
-  const apiKey = getLocalSetting('geminiApiKey'); // 既に取得しているはず
+  const apiKey = getLocalSetting('geminiApiKey');
   try {
     const res = await fetch("/api/tts", {
       method: "POST",
@@ -843,14 +843,21 @@ async function playTTS(text) {
       body: JSON.stringify({
         text,
         voice: "Kore",
-        apiKey, // 👈 ユーザーのAPIキーを渡す！
-      })
+        apiKey,
+      }),
     });
 
-    const { audioBase64, error } = await res.json();
-    if (error) throw new Error(error);
+    const resText = await res.text(); // ← JSONであることを保証せずまず生で確認
+    let json;
+    try {
+      json = JSON.parse(resText);
+    } catch (e) {
+      throw new Error("レスポンスがJSONで返ってきませんでした: " + resText);
+    }
 
-    const audio = new Audio(`data:audio/wav;base64,${audioBase64}`);
+    if (json.error) throw new Error(json.error);
+
+    const audio = new Audio(`data:audio/wav;base64,${json.audioBase64}`);
     await audio.play();
   } catch (e) {
     console.error("TTSエラー", e);
