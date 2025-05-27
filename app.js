@@ -274,6 +274,10 @@ const exportJsonBtn = document.getElementById('exportJsonBtn');
 const importJsonFile = document.getElementById('importJsonFile');
 const importJsonBtn = document.getElementById('importJsonBtn');
 
+const ttsBtn = document.getElementById('ttsBtn');
+let lastTranslatedText = ''; // 最後の翻訳テキスト
+
+
 // ページロード時に保存済み設定を読み込んで反映
 (function initExplainMode() {
   const saved = localStorage.getItem('explainMode');
@@ -702,6 +706,9 @@ translateBtn.addEventListener('click', async () => {
     const out = json.candidates?.[0]?.content?.parts?.[0]?.text || '';
     const [partTrans, partExpl] = out.split(/Explanation:/);
     const translationRaw = partTrans.replace(/^[\s\n]*Translation:\s*/i, '').trim();
+    lastTranslatedText = translationRaw;
+    ttsBtn.style.display = 'block';
+
     const explanationRaw = (partExpl || '').trim();
     currentExplanationRaw = explanationRaw;
 
@@ -755,6 +762,13 @@ translateBtn.addEventListener('click', async () => {
       navigator.clipboard.writeText(translationRaw);
     };
     currentTranslation = translationRaw;
+
+
+    currentTranslation = translationRaw;
+    lastTranslatedText = translationRaw;
+    ttsBtn.style.display = 'block'; // 読み上げボタン表示
+
+
     saveBtn.disabled = false;
   } catch (e) {
     translationSection.innerHTML = `<div class="text-danger">⚠️ 翻訳失敗: ${e.message}</div>`;
@@ -813,6 +827,43 @@ saveBtn.addEventListener('click', async () => {
       saveBtn.disabled = false;
       saveBtn.innerHTML = origHTML;
     }, 1500);
+  }
+});
+
+
+/**
+ * Gemini TTS で音声を再生
+ */
+async function playTTS(text) {
+  const apiKey = getLocalSetting('geminiApiKey'); // 既に取得しているはず
+  try {
+    const res = await fetch("/api/tts", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        text,
+        voice: "Kore",
+        apiKey, // 👈 ユーザーのAPIキーを渡す！
+      })
+    });
+
+    const { audioBase64, error } = await res.json();
+    if (error) throw new Error(error);
+
+    const audio = new Audio(`data:audio/wav;base64,${audioBase64}`);
+    await audio.play();
+  } catch (e) {
+    console.error("TTSエラー", e);
+    alert("読み上げに失敗しました: " + e.message);
+  }
+}
+
+
+
+// ✅ 読み上げボタンイベント登録
+ttsBtn.addEventListener('click', () => {
+  if (lastTranslatedText) {
+    playTTS(lastTranslatedText);
   }
 });
 
