@@ -274,6 +274,10 @@ const exportJsonBtn = document.getElementById('exportJsonBtn');
 const importJsonFile = document.getElementById('importJsonFile');
 const importJsonBtn = document.getElementById('importJsonBtn');
 
+const ttsBtn = document.getElementById('ttsBtn');
+let lastTranslatedText = ''; // 最後の翻訳テキスト
+
+
 // ページロード時に保存済み設定を読み込んで反映
 (function initExplainMode() {
   const saved = localStorage.getItem('explainMode');
@@ -590,9 +594,13 @@ ${context}`;
 
   prompt += `
 
-以下を実行してください：
+  以下を実行してください：
 
-1. 「Translation」にContextに沿った自然な${toLabel}に翻訳・意訳を出力してください。`;
+1. 「Translation」には、「Source」の内容を忠実に翻訳・意訳してください。自然な${toLabel}にしてください。`;
+
+  if (context) {
+    prompt += `※「Context」は参考情報として活用し、翻訳内容そのものには含めないでください。`;
+  }
 
   if (enableExplanation) {
     prompt += `
@@ -641,6 +649,9 @@ function resetTranslationUI() {
 }
 
 translateBtn.addEventListener('click', async () => {
+  // 翻訳開始前に音声読み上げの部分を非表示にする
+  document.getElementById('ttsControls').style.display = 'none';
+
   const apiKey = getLocalSetting('geminiApiKey');
   const mother = getLocalSetting('motherLang');
   const learn = getLocalSetting('learnLang');
@@ -700,6 +711,12 @@ translateBtn.addEventListener('click', async () => {
     const out = json.candidates?.[0]?.content?.parts?.[0]?.text || '';
     const [partTrans, partExpl] = out.split(/Explanation:/);
     const translationRaw = partTrans.replace(/^[\s\n]*Translation:\s*/i, '').trim();
+    lastTranslatedText = translationRaw;
+
+    const ttsControls = document.getElementById('ttsControls');
+    ttsControls.classList.remove('d-none');
+    ttsControls.classList.add('d-flex'); // レイアウト調整のため必要なら
+
     const explanationRaw = (partExpl || '').trim();
     currentExplanationRaw = explanationRaw;
 
@@ -753,6 +770,8 @@ translateBtn.addEventListener('click', async () => {
       navigator.clipboard.writeText(translationRaw);
     };
     currentTranslation = translationRaw;
+    lastTranslatedText = translationRaw;
+
     saveBtn.disabled = false;
   } catch (e) {
     translationSection.innerHTML = `<div class="text-danger">⚠️ 翻訳失敗: ${e.message}</div>`;
@@ -814,6 +833,222 @@ saveBtn.addEventListener('click', async () => {
   }
 });
 
+
+/**
+ * Gemini TTS で音声を再生
+ */
+let selectedVoice = "Kore"; // デフォルト
+
+const VOICE_LIST = [
+  { name: "Zephyr", style: "Bright", gender: "female" },
+  { name: "Puck", style: "Upbeat", gender: "male" },
+  { name: "Charon", style: "Informative", gender: "male" },
+  { name: "Kore", style: "Firm", gender: "female" },
+  { name: "Fenrir", style: "Excitable", gender: "male" },
+  { name: "Leda", style: "Youthful", gender: "female" },
+  { name: "Orus", style: "Firm", gender: "male" },
+  { name: "Aoede", style: "Breezy", gender: "female" },
+  { name: "Callirrhoe", style: "Easy-going", gender: "female" },
+  { name: "Autonoe", style: "Bright", gender: "female" },
+  { name: "Enceladus", style: "Breathy", gender: "male" },
+  { name: "Iapetus", style: "Clear", gender: "male" },
+  { name: "Umbriel", style: "Easy-going", gender: "male" },
+  { name: "Algieba", style: "Smooth", gender: "male" },
+  { name: "Despina", style: "Smooth", gender: "female" },
+  { name: "Erinome", style: "Clear", gender: "female" },
+  { name: "Algenib", style: "Gravelly", gender: "male" },
+  { name: "Rasalgethi", style: "Informative", gender: "male" },
+  { name: "Laomedeia", style: "Upbeat", gender: "female" },
+  { name: "Achernar", style: "Soft", gender: "female" },
+  { name: "Alnilam", style: "Firm", gender: "male" },
+  { name: "Schedar", style: "Even", gender: "male" },
+  { name: "Gacrux", style: "Mature", gender: "female" },
+  { name: "Pulcherrima", style: "Forward", gender: "female" },
+  { name: "Achird", style: "Friendly", gender: "male" },
+  { name: "Zubenelgenubi", style: "Casual", gender: "male" },
+  { name: "Vindemiatrix", style: "Gentle", gender: "female" },
+  { name: "Sadachbia", style: "Lively", gender: "male" },
+  { name: "Sadaltager", style: "Knowledgeable", gender: "male" },
+  { name: "Sulafat", style: "Warm", gender: "female" }
+];
+
+// プルダウン初期化
+const voiceSelect = document.getElementById("voiceSelect");
+voiceSelect.innerHTML = '';
+
+// 分類グループを作成
+const maleGroup = document.createElement('optgroup');
+maleGroup.label = '👨 Male Voices';
+
+const femaleGroup = document.createElement('optgroup');
+femaleGroup.label = '👩 Female Voices';
+
+function tVoiceStyle(style) {
+  const lang = getLocalSetting('motherLang') || 'en';
+  return i18nText.voiceStyles?.[style]?.[lang] || style;
+}
+
+VOICE_LIST.forEach(v => {
+  const opt = document.createElement("option");
+  opt.value = v.name;
+  opt.textContent = `${v.name} – ${tVoiceStyle(v.style)}`;
+  if (v.name === selectedVoice) opt.selected = true;
+
+  if (v.gender === 'male') {
+    maleGroup.appendChild(opt);
+  } else if (v.gender === 'female') {
+    femaleGroup.appendChild(opt);
+  }
+});
+
+voiceSelect.appendChild(maleGroup);
+voiceSelect.appendChild(femaleGroup);
+
+// Gemini API呼び出しでselectedVoiceを反映
+async function playTTS(text) {
+  const apiKey = getLocalSetting('geminiApiKey');
+  const endpoint = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent';
+
+  const body = {
+    model: "gemini-2.5-flash-preview-tts",
+    contents: [{ parts: [{ text }] }],
+    generationConfig: {
+      responseModalities: ["AUDIO"],
+      speechConfig: {
+        voiceConfig: {
+          prebuiltVoiceConfig: {
+            voiceName: selectedVoice
+          }
+        }
+      }
+    }
+  };
+
+  try {
+    const res = await fetch(`${endpoint}?key=${apiKey}`, {
+      method: 'POST',
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    });
+
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const json = await res.json();
+    const base64Audio = json?.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+    if (!base64Audio) throw new Error("音声データが取得できませんでした");
+
+    const pcmData = Uint8Array.from(atob(base64Audio), c => c.charCodeAt(0));
+    const wavData = encodeWAV(pcmData, {
+      sampleRate: 24000,
+      channels: 1,
+      bitsPerSample: 16,
+    });
+
+    const blob = new Blob([wavData], { type: 'audio/wav' });
+    const url = URL.createObjectURL(blob);
+    const audio = new Audio(url);
+    audio.play();
+  } catch (e) {
+    console.error("TTSエラー", e);
+    alert("読み上げに失敗しました: " + e.message);
+  }
+}
+
+function encodeWAV(samples, options) {
+  const { sampleRate, channels, bitsPerSample } = options;
+  const blockAlign = channels * bitsPerSample / 8;
+  const byteRate = sampleRate * blockAlign;
+  const buffer = new ArrayBuffer(44 + samples.length);
+  const view = new DataView(buffer);
+
+  const writeString = (offset, string) => {
+    for (let i = 0; i < string.length; i++) {
+      view.setUint8(offset + i, string.charCodeAt(i));
+    }
+  };
+
+  writeString(0, 'RIFF');
+  view.setUint32(4, 36 + samples.length, true);
+  writeString(8, 'WAVE');
+  writeString(12, 'fmt ');
+  view.setUint32(16, 16, true);
+  view.setUint16(20, 1, true); // PCM
+  view.setUint16(22, channels, true);
+  view.setUint32(24, sampleRate, true);
+  view.setUint32(28, byteRate, true);
+  view.setUint16(32, blockAlign, true);
+  view.setUint16(34, bitsPerSample, true);
+  writeString(36, 'data');
+  view.setUint32(40, samples.length, true);
+
+  for (let i = 0; i < samples.length; i++) {
+    view.setUint8(44 + i, samples[i]);
+  }
+
+  return view;
+}
+
+// API選択プルダウン取得
+const ttsEngineSelect = document.getElementById('ttsEngineSelect');
+const voiceSelectWrapper = document.getElementById('voiceSelectWrapper');
+
+// Web Speech API 用関数
+function playWebSpeech(text) {
+  const utter = new SpeechSynthesisUtterance(text);
+  window.speechSynthesis.speak(utter);
+}
+
+function updateVoiceSettingUI() {
+  const engine = ttsEngineSelect.value;
+  const isGemini = engine === 'gemini';
+  voiceSelectWrapper.style.display = isGemini ? 'block' : 'none';
+}
+
+document.getElementById('ttsSettingBtn').addEventListener('click', () => {
+  const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('ttsSettingModal'));
+  modal.show();
+});
+
+voiceSelect.addEventListener("change", e => {
+  selectedVoice = e.target.value;
+  localStorage.setItem('ttsVoice', selectedVoice);
+});
+
+function updateVoiceSelectVisibility() {
+  if (ttsEngineSelect.value === 'gemini') {
+    voiceSelectWrapper.style.display = '';
+  } else {
+    voiceSelectWrapper.style.display = 'none';
+  }
+}
+
+// 初期表示
+updateVoiceSelectVisibility();
+// 値が変わったら再度制御
+ttsEngineSelect.addEventListener('change', () => {
+  updateVoiceSettingUI();
+  localStorage.setItem('ttsEngine', ttsEngineSelect.value);
+});
+
+// 読み上げボタンイベント登録
+ttsBtn.addEventListener('click', () => {
+  if (!lastTranslatedText) return;
+
+  // コンテキスト込みテキスト生成
+  const context = contextText?.value.trim();
+  const plain = lastTranslatedText;
+  const text = context
+    ? `In the context of: ${context}\nSay naturally: ${plain}`
+    : `Say naturally: ${plain}`;
+
+  // 選択されたエンジンで分岐
+  const engine = ttsEngineSelect.value;
+  if (engine === 'gemini') {
+    playTTS(text);
+  } else {
+    playWebSpeech(plain);
+  }
+});
+
 exportJsonBtn.addEventListener('click', async () => {
   const tx = db.transaction(STORE_NAME, 'readonly');
   const store = tx.objectStore(STORE_NAME);
@@ -867,6 +1102,10 @@ importJsonBtn.addEventListener('click', () => {
 
 (async () => {
   await openDb();
+
+  ttsEngineSelect.value = getLocalSetting('ttsEngine') || 'webspeech';
+  voiceSelect.value = getLocalSetting('ttsVoice') || 'Kore';
+  updateVoiceSettingUI();
 
   // ラベル多言語対応
   updateLanguageLabels();
