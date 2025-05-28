@@ -76,11 +76,17 @@ function updateLanguageLabels() {
   const bookmarkTitle = document.getElementById('bookmarkTitle');
   if (bookmarkTitle) bookmarkTitle.textContent = t('bookmarkTitle');
 
+  const bookmarkDetailTitle = document.querySelector('#bookmarkDetailModal .modal-title');
+  if (bookmarkDetailTitle) bookmarkDetailTitle.textContent = t('bookmarkDetailTitle');
+
   const labelOriginal = document.getElementById('labelOriginal');
   if (labelOriginal) labelOriginal.textContent = t('originalLabel');
 
   const labelTranslated = document.getElementById('labelTranslated');
   if (labelTranslated) labelTranslated.textContent = t('translatedLabel');
+
+  const labelPronunciation = document.getElementById('labelPronunciation');
+  if (labelPronunciation) labelPronunciation.textContent = t('labelPronunciation');
 
   const labelContext = document.getElementById('labelContext');
   if (labelContext) labelContext.textContent = t('contextLabel');
@@ -209,9 +215,14 @@ function openDb() {
 }
 
 async function saveTranslation(entry) {
-  const tx = db.transaction(STORE_NAME, 'readwrite');
-  tx.objectStore(STORE_NAME).add(entry);
-  return tx.complete;
+  try {
+    const tx = db.transaction(STORE_NAME, 'readwrite');
+    tx.objectStore(STORE_NAME).add(entry);
+    await tx.complete;
+  } catch (err) {
+    console.error("💥 IndexedDB 保存失敗:", err, entry);
+    throw err; // 呼び出し元の「保存失敗」メッセージに繋がる
+  }
 }
 
 async function loadBookmarks() {
@@ -238,6 +249,7 @@ async function loadBookmarks() {
             <small class="text-muted">${new Date(d.timestamp).toLocaleString()}</small>
             <div><strong>${t('listOriginal')}</strong> ${d.original}</div>
             <div><strong>${t('listTranslated')}</strong> ${d.translated}</div>
+            <div><strong>${t('labelPronunciation')}</strong> ${d.pronunciation || t('pronunciationNotProvided')}</div>
           </div>
           <button class="btn btn-sm btn-outline-danger ms-2" data-id="${d.id}">
             <i class="bi bi-trash"></i>
@@ -260,10 +272,14 @@ async function loadBookmarks() {
     card.querySelector('.card-body').addEventListener('click', () => {
       document.getElementById('modalOriginalText').textContent = d.original;
       document.getElementById('modalTranslatedText').textContent = d.translated;
+      const pronunciationDiv = document.getElementById('modalPronunciationText');
+      if (pronunciationDiv) {
+        pronunciationDiv.textContent = d.pronunciation || t('pronunciationNotProvided');
+      }
       document.getElementById('modalContextText').textContent =
-        d.context ? d.context : '（文脈は入力されていません）';
+        d.context ? d.context : t('contextNotProvided');
       document.getElementById('modalExplanationText').innerHTML =
-        d.explanation ? marked.parse(d.explanation) : '<em>解説は保存されていません</em>';
+        d.explanation ? marked.parse(d.explanation) : t('explanationNotProvided');
       bootstrap.Modal.getOrCreateInstance(document.getElementById('bookmarkDetailModal')).show();
     });
 
@@ -399,6 +415,7 @@ function getGeminiEndpoint() {
 
 let currentTranslation = '';
 let currentLangs = {};
+let currentPronunciationRaw = '';
 let currentExplanationRaw = '';
 
 function getLocalSetting(key, fallback = '') {
@@ -734,15 +751,52 @@ translateBtn.addEventListener('click', async () => {
         generationConfig: { maxOutputTokens: 4096 }
       })
     });
+    if (!res.ok) {
+      const json = await res.json().catch(() => null);
+      const message = json?.error?.message || `HTTP ${res.status}`;
+
+      if (res.status === 429) {
+        throw new Error(t('errorTooManyRequests') || 'リクエストが多すぎます。時間をおいて再試行してください。');
+      }
+
+      if (res.status === 503 && message.includes('overloaded')) {
+        throw new Error(t('errorModelOverloaded') || 'モデルが過負荷です。時間をおいて再試行してください。');
+      }
+
+      throw new Error(message);
+    }
     const json = await res.json();
     console.log('🌐 翻訳APIレスポンス:', json);
     const out = json.candidates?.[0]?.content?.parts?.[0]?.text || '';
-    const [_, translationBlock, pronunciationBlock, explanationBlock] =
-      out.match(/Translation:\s*([\s\S]*?)\n+Pronunciation:\s*([\s\S]*?)(?:\n+Explanation:\s*([\s\S]*))?$/) || [];
 
-    const translationRaw = (translationBlock || '').trim();
-    const pronunciationRaw = (pronunciationBlock || '').trim();
-    const explanationRaw = (explanationBlock || '').trim();
+    // 柔軟な分割方式で各ブロックを取得
+    let translationRaw = '';
+    let pronunciationRaw = '';
+    let explanationRaw = '';
+
+    // 分け方の基本アイデア：まず Pronunciation: で分割
+    const parts = out.split(/Pronunciation:\s*/);
+
+    if (parts.length >= 2) {
+      // 1個目 → 翻訳文（Translation）
+      translationRaw = parts[0].trim();
+      // translationRaw の先頭に 'Translation:' があれば除去する
+      if (translationRaw.startsWith('Translation:')) {
+        translationRaw = translationRaw.replace(/^Translation:\s*/i, '');
+      }
+
+      // 2個目をさらに Explanation: で分割
+      const subparts = parts[1].split(/Explanation:\s*/);
+      pronunciationRaw = subparts[0].trim();
+
+      // 説明がある場合だけ
+      if (subparts.length >= 2) {
+        explanationRaw = subparts[1].trim();
+      }
+    } else {
+      // 万が一「Pronunciation:」がなかったら全文を翻訳として扱う
+      translationRaw = out.trim();
+    }
 
     lastTranslatedText = translationRaw;
 
@@ -808,6 +862,7 @@ translateBtn.addEventListener('click', async () => {
     };
     currentTranslation = translationRaw;
     lastTranslatedText = translationRaw;
+    currentPronunciationRaw = pronunciationRaw;
 
     saveBtn.disabled = false;
   } catch (e) {
@@ -848,6 +903,7 @@ saveBtn.addEventListener('click', async () => {
       timestamp: Date.now(),
       original: inputText.value.trim(),
       translated: currentTranslation,
+      pronunciation: currentPronunciationRaw,
       explanation: currentExplanationRaw,
       context: contextText.value.trim(),
       src: currentLangs.src,
