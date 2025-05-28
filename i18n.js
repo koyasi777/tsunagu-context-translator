@@ -332,5 +332,205 @@ export const i18nText = {
         zh: '请访问 <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer">Google AI Studio 官方页面</a>，然后将 API 密钥粘贴到下方输入框中。',
         ko: '<a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer">Google AI Studio 공식 페이지</a>를 방문하고 API 키를 아래 입력란에 붙여넣으세요.',
         de: 'Besuchen Sie die <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer">offizielle Google AI Studio-Seite</a> und fügen Sie den API-Schlüssel unten ein.'
+    },
+    voiceStyles: {
+        Bright: {
+            ja: '明るい',
+            en: 'Bright',
+            es: 'Brillante',
+            fr: 'Clair',
+            zh: '明亮',
+            ko: '밝은',
+            de: 'Hell'
+        },
+        Upbeat: {
+            ja: '元気な',
+            en: 'Upbeat',
+            es: 'Animado',
+            fr: 'Enjoué',
+            zh: '欢快',
+            ko: '쾌활한',
+            de: 'Beschwingt'
+        },
+        Informative: {
+            ja: '説明的',
+            en: 'Informative',
+            es: 'Informativo',
+            fr: 'Informatif',
+            zh: '信息丰富',
+            ko: '설명적인',
+            de: 'Informativ'
+        },
+        Firm: {
+            ja: 'しっかりした',
+            en: 'Firm',
+            es: 'Firme',
+            fr: 'Ferme',
+            zh: '坚定',
+            ko: '단호한',
+            de: 'Fest'
+        },
+        Youthful: {
+            ja: '若々しい',
+            en: 'Youthful',
+            es: 'Juvenil',
+            fr: 'Jeune',
+            zh: '年轻',
+            ko: '젊은',
+            de: 'Jugendlich'
+        },
+        Excitable: {
+            ja: '興奮した',
+            en: 'Excitable',
+            es: 'Excitable',
+            fr: 'Excité',
+            zh: '激动的',
+            ko: '흥분한',
+            de: 'Aufgeregt'
+        },
+        Breezy: {
+            ja: '軽やか',
+            en: 'Breezy',
+            es: 'Alegre',
+            fr: 'Enjoué',
+            zh: '轻快',
+            ko: '산뜻한',
+            de: 'Unbeschwert'
+        },
+        "Easy-going": {
+            ja: 'おおらか',
+            en: 'Easy-going',
+            es: 'Tranquilo',
+            fr: 'Décontracté',
+            zh: '随和',
+            ko: '느긋한',
+            de: 'Gelassen'
+        },
+        Smooth: {
+            ja: '滑らか',
+            en: 'Smooth',
+            es: 'Suave',
+            fr: 'Fluide',
+            zh: '流畅',
+            ko: '부드러운',
+            de: 'Sanft'
+        },
+        Clear: {
+            ja: '明瞭',
+            en: 'Clear',
+            es: 'Claro',
+            fr: 'Clair',
+            zh: '清晰',
+            ko: '명확한',
+            de: 'Klar'
+        },
+        Breathy: {
+            ja: '息遣いがある',
+            en: 'Breathy',
+            es: 'Susurrante',
+            fr: 'Soufflé',
+            zh: '轻声细语',
+            ko: '숨결 있는',
+            de: 'Hauchig'
+        },
+        Soft: {
+            ja: '柔らかい',
+            en: 'Soft',
+            es: 'Suave',
+            fr: 'Doux',
+            zh: '柔和',
+            ko: '부드러운',
+            de: 'Weich'
+        },
+        Friendly: {
+            ja: '親しみやすい',
+            en: 'Friendly',
+            es: 'Amistoso',
+            fr: 'Amical',
+            zh: '友好',
+            ko: '친근한',
+            de: 'Freundlich'
+        },
+        Gentle: {
+            ja: '優しい',
+            en: 'Gentle',
+            es: 'Gentil',
+            fr: 'Doux',
+            zh: '温和',
+            ko: '온화한',
+            de: 'Sanftmütig'
+        },
+        Lively: {
+            ja: '活気のある',
+            en: 'Lively',
+            es: 'Animado',
+            fr: 'Vif',
+            zh: '生动',
+            ko: '활기찬',
+            de: 'Lebhaft'
+        },
+        Knowledgeable: {
+            ja: '博識な',
+            en: 'Knowledgeable',
+            es: 'Sabio',
+            fr: 'Informé',
+            zh: '知识丰富',
+            ko: '박식한',
+            de: 'Sachkundig'
+        },
+        Warm: {
+            ja: '温かみのある',
+            en: 'Warm',
+            es: 'Cálido',
+            fr: 'Chaleureux',
+            zh: '温暖',
+            ko: '따뜻한',
+            de: 'Herzlich'
+        },
+        Casual: {
+            ja: 'カジュアル',
+            en: 'Casual',
+            es: 'Informal',
+            fr: 'Décontracté',
+            zh: '随意',
+            ko: '캐주얼한',
+            de: 'Lässig'
+        },
+        Even: {
+            ja: '均整のとれた',
+            en: 'Even',
+            es: 'Equilibrado',
+            fr: 'Égal',
+            zh: '平稳',
+            ko: '고른',
+            de: 'Ausgeglichen'
+        },
+        Forward: {
+            ja: '前向き',
+            en: 'Forward',
+            es: 'Directo',
+            fr: 'Audacieux',
+            zh: '进取',
+            ko: '전향적인',
+            de: 'Vorwärtsgerichtet'
+        },
+        Mature: {
+            ja: '落ち着いた',
+            en: 'Mature',
+            es: 'Maduro',
+            fr: 'Mature',
+            zh: '成熟',
+            ko: '성숙한',
+            de: 'Reif'
+        },
+        Gravelly: {
+            ja: 'しわがれた',
+            en: 'Gravelly',
+            es: 'Ronco',
+            fr: 'Rocailleux',
+            zh: '沙哑的',
+            ko: '쉰 목소리',
+            de: 'Heiser'
+        }
     }
 };
