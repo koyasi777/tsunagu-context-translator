@@ -509,16 +509,16 @@ function getFastLanguageDetectionEndpoint() {
 async function determinePrimaryLanguage(text, mother, learn) {
   const apiKey = getLocalSetting('geminiApiKey');
   const prompt = `
-次の【文】の言語は「${mother}」、「${learn}」のいずれかです。ただ完全にいずれでもない（unknown）の場合もあります。該当するものを以下の3択の中から**1つのみ**出力してください:
+次の【文】の言語は「${mother}」、「${learn}」のいずれかです。該当するものを以下から**1つのみ**出力してください:
 - "${mother}"
 - "${learn}"
-- "unknown"
 
 【文】
 ${text}
 
 【ルール】
 ※ 「${mother}」「${learn}」の場合は**言語コード**のみで出力
+※ 万が一いずれにも該当しない場合は"unkown"と出力
 ※ 補足・記号・引用なし
 `;
 
@@ -595,8 +595,11 @@ function generatePrompt(text, src, mother, learn, context, enableExplanation) {
   const directionDesc = `${toLabel}に翻訳・意訳した内容`;
 
   let prompt = `あなたは、${motherLabel}を母語とするuserが、${learnLabel}を学ぶ為に設計された超高性能な翻訳機です。
+
+■ 前提情報
 「Source」とは、userが入力した${fromLabel}の内容。
-「Translation」とは、${directionDesc}。`;
+「Translation」とは、${directionDesc}。
+「Pronunciation」とは、その${learnLabel}の発音方法。`;
 
   if (enableExplanation) {
     prompt += `
@@ -612,7 +615,7 @@ ${context}`;
 
   prompt += `
 
-  以下を実行してください：
+■ 以下を実行してください：
 
 1. 「Translation」には、「Source」の内容を忠実に翻訳・意訳してください。自然な${toLabel}にしてください。`;
 
@@ -620,9 +623,12 @@ ${context}`;
     prompt += `※「Context」は参考情報として活用し、翻訳内容そのものには含めないでください。`;
   }
 
+  prompt += `
+2. 「Pronunciation」に、その${learnLabel}の発音方法のみを${motherLabel}を母語とする人が読めるように出力。`;
+
   if (enableExplanation) {
     prompt += `
-2. 「Explanation」には、その**${learnLabel}について**、読み方や発音方法、詳細なニュアンスの説明、例文、類義語、対義語、${learnLabel}を母語とする人たちとの文化的背景の差異などを含めます。ただし、**${motherLabel}で**教えてください。`;
+3. 「Explanation」には、その**${learnLabel}について**、読み方や発音方法、詳細なニュアンスの説明、例文、類義語、対義語、${learnLabel}を母語とする人たちとの文化的背景の差異などを含めます。ただし、**${motherLabel}で**教えてください。`;
   }
 
   // 出力制限セクション
@@ -639,12 +645,16 @@ ${context}`;
 Translation:
 ${text}
 
+Pronunciation:
+
 Explanation:`;
   } else {
     prompt += `
 
 Translation:
-${text}`;
+${text}
+
+Pronunciation:`;
   }
 
   return prompt;
@@ -727,15 +737,19 @@ translateBtn.addEventListener('click', async () => {
     const json = await res.json();
     console.log('🌐 翻訳APIレスポンス:', json);
     const out = json.candidates?.[0]?.content?.parts?.[0]?.text || '';
-    const [partTrans, partExpl] = out.split(/Explanation:/);
-    const translationRaw = partTrans.replace(/^[\s\n]*Translation:\s*/i, '').trim();
+    const [_, translationBlock, pronunciationBlock, explanationBlock] =
+      out.match(/Translation:\s*([\s\S]*?)\n+Pronunciation:\s*([\s\S]*?)(?:\n+Explanation:\s*([\s\S]*))?$/) || [];
+
+    const translationRaw = (translationBlock || '').trim();
+    const pronunciationRaw = (pronunciationBlock || '').trim();
+    const explanationRaw = (explanationBlock || '').trim();
+
     lastTranslatedText = translationRaw;
 
     const ttsControls = document.getElementById('ttsControls');
     ttsControls.classList.remove('d-none');
     ttsControls.classList.add('d-flex'); // レイアウト調整のため必要なら
 
-    const explanationRaw = (partExpl || '').trim();
     currentExplanationRaw = explanationRaw;
 
     // 翻訳出力＋ボタン表示エリア全体を構築
@@ -746,7 +760,12 @@ translateBtn.addEventListener('click', async () => {
     // 翻訳結果のマークダウン部分
     const resultDiv = document.createElement('div');
     resultDiv.className = 'markdown-body';
-    resultDiv.innerHTML = marked.parse(translationRaw);
+    resultDiv.innerHTML = `
+      ${marked.parse(translationRaw)}
+      <div class="mt-2 text-muted" style="font-size: 0.8em; font-style: italic;">
+        ${pronunciationRaw}
+      </div>
+    `;
 
     // コピー用ボタン
     const copyBtn = document.createElement('button');
