@@ -195,6 +195,19 @@
             </div>
             <button id="copyTranslationBtn" class="btn btn-outline-primary btn-sm mt-2" style="display:none;">Copy</button>
           </div>
+          <div id="ttsControls" class="row g-2 mb-3 d-none">
+            <div class="col-12 col-md-6">
+              <button id="ttsBtn" class="btn btn-outline-secondary w-100">
+                ▶️ 読み上げ
+              </button>
+            </div>
+            <div class="col-12 col-md-6">
+              <button id="ttsSettingBtn" class="btn btn-outline-secondary w-100">
+                ⚙️ Voice Setting
+              </button>
+            </div>
+          </div>
+
           <div id="explanationSection" class="border bg-white p-3" style="min-height:240px; display: none;">
             <div id="explanationPlaceholder" class="text-muted text-center py-5">
               解説がここに表示されます
@@ -311,6 +324,33 @@
         <button id="importJsonBtn" class="btn btn-outline-danger w-100">インポート実行</button>
       </div>
     </div></div>
+  </div>
+
+  <div class="modal fade" id="ttsSettingModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Voice Settings</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="ttsEngineSelect" class="form-label">Engine</label>
+            <select id="ttsEngineSelect" class="form-select">
+              <option value="webspeech">Web Speech API</option>
+              <option value="gemini">Gemini TTS</option>
+            </select>
+          </div>
+  
+          <div class="mb-3" id="voiceSelectWrapper" style="display:none;">
+            <label for="voiceSelect" class="form-label">Gemini Voice</label>
+            <select id="voiceSelect" class="form-select">
+              <!-- 動的に生成 -->
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- ブックマーク詳細モーダル -->
