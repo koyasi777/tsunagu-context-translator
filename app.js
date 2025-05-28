@@ -1062,7 +1062,7 @@ ttsEngineSelect.addEventListener('change', () => {
 });
 
 // 読み上げボタンイベント登録
-ttsBtn.addEventListener('click', () => {
+ttsBtn.addEventListener('click', async () => {
   if (!lastTranslatedText) return;
 
   // コンテキスト込みテキスト生成
@@ -1095,12 +1095,25 @@ Sentence: ${plain}
 Sentence: ${plain}
     `.trim();
 
+  // === UX向上：ローディング表示 ===
+  const originalHTML = ttsBtn.innerHTML;
+  ttsBtn.disabled = true;
+  ttsBtn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span> ${t('loadingTTS')}`;
+
   // 選択されたエンジンで分岐
   const engine = ttsEngineSelect.value;
-  if (engine === 'gemini') {
-    playTTS(text);
-  } else {
-    playWebSpeech(plain);
+
+  try {
+    if (engine === 'gemini') {
+      await playTTS(text);
+    } else {
+      playWebSpeech(plain);
+    }
+  } catch (e) {
+    alert('読み上げに失敗しました: ' + e.message);
+  } finally {
+    ttsBtn.disabled = false;
+    ttsBtn.innerHTML = originalHTML;
   }
 });
 
