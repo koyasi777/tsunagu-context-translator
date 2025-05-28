@@ -532,5 +532,70 @@ export const i18nText = {
             ko: '쉰 목소리',
             de: 'Heiser'
         }
+    },
+    // === 読み上げ・音声設定UI対応 ===
+    ttsButton: {
+        ja: '▶️ 読み上げ',
+        en: '▶️ Read Aloud',
+        es: '▶️ Leer en voz alta',
+        fr: '▶️ Lecture vocale',
+        zh: '▶️ 朗读',
+        ko: '▶️ 음성 읽기',
+        de: '▶️ Vorlesen'
+    },
+    ttsSetting: {
+        ja: '⚙️ Voice Settings',
+        en: '⚙️ Voice Settings',
+        es: '⚙️ Configuración de voz',
+        fr: '⚙️ Paramètres vocaux',
+        zh: '⚙️ 语音设置',
+        ko: '⚙️ 음성 설정',
+        de: '⚙️ Stimmeinstellungen'
+    },
+    voiceSettingTitle: {
+        ja: 'Voice Settings',
+        en: 'Voice Settings',
+        es: 'Configuración de voz',
+        fr: 'Paramètres vocaux',
+        zh: '语音设置',
+        ko: '음성 설정',
+        de: 'Stimmeinstellungen'
+    },
+    ttsEngine: {
+        ja: 'Engine',
+        en: 'Engine',
+        es: 'Motor',
+        fr: 'Moteur',
+        zh: '引擎',
+        ko: '엔진',
+        de: 'Engine'
+    },
+    geminiVoice: {
+        ja: 'Gemini Voice',
+        en: 'Gemini Voice',
+        es: 'Voz de Gemini',
+        fr: 'Voix Gemini',
+        zh: 'Gemini 语音',
+        ko: 'Gemini 음성',
+        de: 'Gemini-Stimme'
+    },
+    errorTooManyRequests: {
+        ja: '⚠️ APIの使用制限に達しました。しばらく待ってから再試行してください。',
+        en: '⚠️ Rate limit exceeded. Please wait and try again later.',
+        es: '⚠️ Se ha superado el límite de uso. Inténtalo de nuevo más tarde.',
+        fr: '⚠️ Limite d’utilisation atteinte. Veuillez réessayer plus tard.',
+        zh: '⚠️ 已超出 API 使用限制。请稍后再试。',
+        ko: '⚠️ 요청 제한을 초과했습니다. 잠시 후 다시 시도하세요.',
+        de: '⚠️ API-Nutzungsgrenze erreicht. Bitte später erneut versuchen.'
+    },
+    errorModelOverloaded: {
+        ja: '⚠️ モデルが過負荷状態です。数分後にもう一度お試しください。',
+        en: '⚠️ The model is currently overloaded. Please try again in a few minutes.',
+        es: '⚠️ El modelo está sobrecargado. Intenta nuevamente más tarde.',
+        fr: '⚠️ Le modèle est surchargé. Veuillez réessayer plus tard.',
+        zh: '⚠️ 模型当前过载，请稍后重试。',
+        ko: '⚠️ 모델이 과부하 상태입니다. 잠시 후 다시 시도하세요.',
+        de: '⚠️ Das Modell ist überlastet. Bitte versuchen Sie es später erneut.'
     }
+
 };
