@@ -124,6 +124,24 @@ function updateLanguageLabels() {
 
   const apiInfoLine2 = document.getElementById('apiInfoLine2');
   if (apiInfoLine2) apiInfoLine2.innerHTML = t('apiInfoLine2');
+
+  // 読み上げ・設定ボタン
+  const ttsBtnEl = document.getElementById('ttsBtn');
+  if (ttsBtnEl) ttsBtnEl.textContent = t('ttsButton');
+
+  const ttsSettingBtnEl = document.getElementById('ttsSettingBtn');
+  if (ttsSettingBtnEl) ttsSettingBtnEl.textContent = t('ttsSetting');
+
+  // モーダルのタイトルとラベル
+  const ttsModalTitle = document.querySelector('#ttsSettingModal .modal-title');
+  if (ttsModalTitle) ttsModalTitle.textContent = t('voiceSettingTitle');
+
+  const ttsEngineLabel = document.querySelector('label[for="ttsEngineSelect"]');
+  if (ttsEngineLabel) ttsEngineLabel.textContent = t('ttsEngine');
+
+  const ttsVoiceLabel = document.querySelector('label[for="voiceSelect"]');
+  if (ttsVoiceLabel) ttsVoiceLabel.textContent = t('geminiVoice');
+
 }
 
 /**
@@ -931,7 +949,16 @@ async function playTTS(text) {
       body: JSON.stringify(body)
     });
 
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    if (!res.ok) {
+      const text = await res.text();
+      if (res.status === 429) {
+        throw new Error('RateLimitExceeded');
+      } else if (res.status === 503) {
+        throw new Error('ModelOverloaded');
+      } else {
+        throw new Error(text || `HTTP ${res.status}`);
+      }
+    }
     const json = await res.json();
     const base64Audio = json?.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
     if (!base64Audio) throw new Error("音声データが取得できませんでした");
@@ -948,8 +975,13 @@ async function playTTS(text) {
     const audio = new Audio(url);
     audio.play();
   } catch (e) {
-    console.error("TTSエラー", e);
-    alert("読み上げに失敗しました: " + e.message);
+    if (e.message === 'ModelOverloaded') {
+      alert(t('errorModelOverloaded'));
+    } else if (e.message === 'RateLimitExceeded') {
+      alert(t('errorTooManyRequests'));
+    } else {
+      alert('読み上げに失敗しました: ' + e.message);
+    }
   }
 }
 
@@ -1103,7 +1135,7 @@ importJsonBtn.addEventListener('click', () => {
 (async () => {
   await openDb();
 
-  ttsEngineSelect.value = getLocalSetting('ttsEngine') || 'webspeech';
+  ttsEngineSelect.value = getLocalSetting('ttsEngine') || 'gemini';
   voiceSelect.value = getLocalSetting('ttsVoice') || 'Kore';
   updateVoiceSettingUI();
 
