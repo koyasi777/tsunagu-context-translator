@@ -634,7 +634,7 @@ ${context}`;
 
 ■ 以下を実行してください：
 
-1. 「Translation」には、「Source」の内容を忠実に翻訳・意訳してください。自然な${toLabel}にしてください。`;
+1. 「Translation」には、「Source」の内容を忠実に**${toLabel}に**翻訳・意訳してください。⚠️誤って${fromLabel}に翻訳しないように`;
 
   if (context) {
     prompt += `※「Context」は参考情報として活用し、翻訳内容そのものには含めないでください。`;
