@@ -1069,8 +1069,31 @@ ttsBtn.addEventListener('click', () => {
   const context = contextText?.value.trim();
   const plain = lastTranslatedText;
   const text = context
-    ? `In the context of: ${context}\nSay naturally: ${plain}`
-    : `Say naturally: ${plain}`;
+    ? `
+あなたはリアル派志向のプロの俳優です。
+
+まずContextとSentenceから今の状況や空間をリアルに想像してください。
+具体的には、
+- その場の状況
+- 声の雰囲気
+- テンション
+などです。
+
+次に、その空間や感情、人との関係性を、あなたの声だけで表現してください。
+笑い声、ため息、息遣い、間などの非言語音声も自由に盛り込んで、とにかくContextに合う空間を作り出してください。
+
+Context: ${context}
+Sentence: ${plain}
+    `.trim()
+    : `
+あなたはリアル派志向のプロの俳優です。
+
+以下のセリフを、自然で感情を込めたトーンで、聞き手にリアルに響くように演じてください。
+その場の空気や人物像を想像しながら、声のトーンやテンポ、雰囲気を自由に調整して構いません。
+笑い声、ため息、息遣い、間などの非言語音声も含めて、あなたらしい演技で表現してください。
+
+Sentence: ${plain}
+    `.trim();
 
   // 選択されたエンジンで分岐
   const engine = ttsEngineSelect.value;
