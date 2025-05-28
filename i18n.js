@@ -207,6 +207,15 @@ export const i18nText = {
         ko: '설정',
         de: 'Einstellungen'
     },
+    bookmarkDetailTitle: {
+        ja: '📘 ブックマーク詳細',
+        en: '📘 Bookmark Details',
+        es: '📘 Detalles del marcador',
+        fr: '📘 Détails du signet',
+        zh: '📘 书签详情',
+        ko: '📘 북마크 상세 정보',
+        de: '📘 Lesezeichendetails'
+      },
     originalLabel: {
         ja: '原文:',
         en: 'Original:',
@@ -224,6 +233,15 @@ export const i18nText = {
         zh: '译文：',
         ko: '번역:',
         de: 'Übersetzung:'
+    },
+    labelPronunciation: {
+        ja: '発音:',
+        en: 'Pronunciation:',
+        es: 'Pronunciación:',
+        fr: 'Prononciation :',
+        zh: '发音：',
+        ko: '발음:',
+        de: 'Aussprache:'
     },
     contextLabel: {
         ja: '文脈:',
@@ -596,6 +614,41 @@ export const i18nText = {
         zh: '⚠️ 模型当前过载，请稍后重试。',
         ko: '⚠️ 모델이 과부하 상태입니다. 잠시 후 다시 시도하세요.',
         de: '⚠️ Das Modell ist überlastet. Bitte versuchen Sie es später erneut.'
+    },
+    loadingTTS: {
+        ja: '読み込み中...',
+        en: 'Loading...',
+        es: 'Cargando...',
+        fr: 'Chargement...',
+        zh: '加载中...',
+        ko: '불러오는 중...',
+        de: 'Lädt...'
+    },
+    contextNotProvided: {
+        ja: '（文脈は入力されていません）',
+        en: '(No context provided)',
+        es: '(No se proporcionó contexto)',
+        fr: '(Aucun contexte fourni)',
+        zh: '（未提供上下文）',
+        ko: '(문맥이 입력되지 않음)',
+        de: '(Kein Kontext angegeben)'
+    },
+    explanationNotProvided: {
+        ja: '<em>解説は保存されていません</em>',
+        en: '<em>No explanation was saved</em>',
+        es: '<em>No se guardó ninguna explicación</em>',
+        fr: '<em>Aucune explication enregistrée</em>',
+        zh: '<em>未保存任何解说</em>',
+        ko: '<em>해설이 저장되지 않았습니다</em>',
+        de: '<em>Keine Erklärung gespeichert</em>'
+    },
+    pronunciationNotProvided: {
+        ja: '（発音は保存されていません）',
+        en: '(No pronunciation saved)',
+        es: '(No se guardó pronunciación)',
+        fr: '(Aucune prononciation enregistrée)',
+        zh: '（未保存发音）',
+        ko: '(발음이 저장되지 않았습니다)',
+        de: '(Keine Aussprache gespeichert)'
     }
-
 };
