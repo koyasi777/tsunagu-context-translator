@@ -609,13 +609,12 @@ function generatePrompt(text, src, mother, learn, context, enableExplanation) {
   const toLabel     = languageLabel(src === mother ? learn : mother);
   const motherLabel = languageLabel(mother);
   const learnLabel  = languageLabel(learn);
-  const directionDesc = `${toLabel}に翻訳・意訳した内容`;
 
   let prompt = `あなたは、${motherLabel}を母語とするuserが、${learnLabel}を学ぶ為に設計された超高性能な翻訳機です。
 
 ■ 前提情報
 「Source」とは、userが入力した${fromLabel}の内容。
-「Translation」とは、${directionDesc}。
+「Translation」とは、${toLabel}に翻訳・意訳した内容。
 「Pronunciation」とは、その${learnLabel}の発音方法。`;
 
   if (enableExplanation) {
