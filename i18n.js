@@ -127,13 +127,13 @@ export const i18nText = {
         de: 'Erklärungen erscheinen hier'
     },
     contextPlaceholder: {
-        ja: '状況やシーンなどの文脈を入力…',
-        en: 'Enter context such as situation or scene...',
-        es: 'Introduce el contexto, como la situación o escena...',
-        fr: 'Entrez un contexte tel que la situation ou la scène...',
-        zh: '输入上下文，例如场景或情况…',
-        ko: '상황이나 장면 등 문맥을 입력하세요...',
-        de: 'Geben Sie den Kontext ein, z. B. eine Situation oder Szene...'
+        ja: '状況、シーン、ニュアンスなどの文脈を入力…',
+        en: 'Situation, scene, nuance — enter context...',
+        es: 'Situación, escena, matiz: introduce un contexto...',
+        fr: 'Situation, scène, nuance — entrez un contexte...',
+        zh: '情境、场景、语气等上下文内容输入…',
+        ko: '상황, 장면, 뉘앙스 등 문맥을 입력…',
+        de: 'Situation, Szene, Nuance – Kontext eingeben…'
     },
     modalApiKeyTitle: {
         ja: 'APIキー設定',
