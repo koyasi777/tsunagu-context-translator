@@ -614,52 +614,53 @@ function generatePrompt(text, src, mother, learn, context, enableExplanation) {
 
 ■ 前提情報
 「Source」とは、userが入力した${fromLabel}の内容。
-「Translation」とは、${toLabel}に翻訳・意訳した内容。
-「Pronunciation」とは、その${learnLabel}の発音方法。`;
+「Translation」とは、「Source」の内容を忠実に**${toLabel}に**翻訳・意訳した内容。⚠️誤って${fromLabel}に翻訳しないこと。`;
+  if (context) {
+    prompt += `
+    ※「Context」は参考情報として活用し、翻訳内容そのものには含めないでください。`;
+  }
+  prompt += `
+「Pronunciation」とは、その${learnLabel}の発音方法のみを${motherLabel}を母語とする人が読めるように出力したもの。`;
 
   if (enableExplanation) {
-    prompt += `
-「Explanation」とは、${learnLabel}を学ぶ、${motherLabel}を母語とする人たちに向けた${motherLabel}による解説。`;
+    if (context) {
+      prompt += `
+「Explanation」とは、${learnLabel}を学ぶ、${motherLabel}を母語とする人たちに向けた、**${motherLabel}で**書かれた解説。その**${learnLabel}の内容について**、読み方や発音方法、今回の文脈をリアルに考慮した詳細なニュアンスの説明、例文、類義語、対義語、${learnLabel}を母語とする人たちとの文化的背景の差異などを含める。`;
+    } else {
+      prompt += `
+「Explanation」とは、${learnLabel}を学ぶ、${motherLabel}を母語とする人たちに向けた、**${motherLabel}で**書かれた解説。その**${learnLabel}の内容について**、読み方や発音方法、詳細なニュアンスの説明、例文、類義語、対義語、${learnLabel}を母語とする人たちとの文化的背景の差異などを含める。`;
+    }
   }
+
+  prompt += `
+■ userからのinput`
 
   // 補足文脈がある場合にのみ追加
   if (context) {
     prompt += `
-【Context】
+Context:
 ${context}`;
   }
 
   prompt += `
-
-■ 以下を実行してください：
-
-1. 「Translation」には、「Source」の内容を忠実に**${toLabel}に**翻訳・意訳してください。⚠️誤って${fromLabel}に翻訳しないように`;
-
-  if (context) {
-    prompt += `※「Context」は参考情報として活用し、翻訳内容そのものには含めないでください。`;
-  }
+Source:
+${text}`
 
   prompt += `
-2. 「Pronunciation」に、その${learnLabel}の発音方法のみを${motherLabel}を母語とする人が読めるように出力。`;
 
-  if (enableExplanation) {
-    prompt += `
-3. 「Explanation」には、その**${learnLabel}について**、読み方や発音方法、詳細なニュアンスの説明、例文、類義語、対義語、${learnLabel}を母語とする人たちとの文化的背景の差異などを含めます。ただし、**${motherLabel}で**教えてください。`;
-  }
-
-  // 出力制限セクション
-  prompt += `
+■ 以下を実行：
 
 ※出力制限
-- 返事はせずに以下のフォーマットに沿って出力
-- **${context ? '「Source」や「Context」の内容を繰り返し出力しない' : '「Source」の内容を繰り返し出力しない'}**`;
+- 返事はせずに以下の出力形式に厳密に従って出力
+- **${context ? '「Source」や「Context」の内容を繰り返し出力しない' : '「Source」の内容を繰り返し出力しない'}**
+
+■ 出力形式`;
 
   // 翻訳先と解説セクション
   if (enableExplanation) {
     prompt += `
 
 Translation:
-${text}
 
 Pronunciation:
 
@@ -668,7 +669,6 @@ Explanation:`;
     prompt += `
 
 Translation:
-${text}
 
 Pronunciation:`;
   }
