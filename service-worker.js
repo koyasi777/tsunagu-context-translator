@@ -1,39 +1,26 @@
-const CACHE_NAME = 'translator-cache-v5.7.5';
-const ASSETS = [
-    './index.html',
-    './app.js',
-    './languages.js',
-    './i18n.js',
-    './manifest.json',
-    './icons/icon-192x192.png',
-    './icons/icon-512x512.png',
-    './offline.html'
-];
+const CACHE_PREFIX = 'translator-cache'; // 残ってるキャッシュのprefix
 
+// install（特に何もしない。skipWaitingは早めに反映のため入れておく）
 self.addEventListener('install', event => {
-    event.waitUntil(
-        caches.open(CACHE_NAME)
-            .then(cache => cache.addAll(ASSETS))
-            .then(() => self.skipWaiting())
-    );
+    self.skipWaiting();
 });
 
+// activate時に「translator-cache」から始まるキャッシュを全削除
 self.addEventListener('activate', event => {
     event.waitUntil(
-        caches.keys().then(keys =>
-            Promise.all(
-                keys.filter(key => key !== CACHE_NAME)
+        (async () => {
+            const keys = await caches.keys();
+            await Promise.all(
+                keys
+                    .filter(key => key.startsWith(CACHE_PREFIX))
                     .map(key => caches.delete(key))
-            )
-        )
+            );
+            self.clients.claim();
+        })()
     );
-    self.clients.claim();
 });
 
+// fetchは全部ネットに流す（キャッシュを一切使わない！）
 self.addEventListener('fetch', event => {
-    event.respondWith(
-        caches.match(event.request)
-            .then(cached => cached || fetch(event.request))
-            .catch(() => caches.match('./offline.html'))
-    );
+    event.respondWith(fetch(event.request));
 });
