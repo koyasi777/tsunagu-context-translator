@@ -371,13 +371,13 @@ contextText.addEventListener('input', () => {
 
 // ==== Gemini モデル選択・URL構成 ====
 const GEMINI_MODELS = {
-  'gemini-2.0-flash-lite': {
-    id: 'gemini-2.0-flash-lite',
-    label: '🔹 Gemini 2.0 Flash-Lite（Default）'
-  },
   'gemini-2.0-flash': {
     id: 'gemini-2.0-flash',
-    label: '🔹 Gemini 2.0 Flash'
+    label: '🔹 Gemini 2.0 Flash（Default）'
+  },
+  'gemini-2.0-flash-lite': {
+    id: 'gemini-2.0-flash-lite',
+    label: '🔹 Gemini 2.0 Flash-Lite'
   },
   'gemini-2.5-flash-preview-05-20': {
     id: 'gemini-2.5-flash-preview-05-20',
@@ -401,7 +401,7 @@ const GEMINI_MODELS = {
   },
 };
 
-const DEFAULT_MODEL_KEY = 'gemini-2.0-flash-lite'; // デフォルト設定のモデル
+const DEFAULT_MODEL_KEY = 'gemini-2.0-flash'; // デフォルト設定のモデル
 
 function getSelectedModel() {
   const key = localStorage.getItem('geminiModel');
@@ -614,7 +614,7 @@ function generatePrompt(text, src, mother, learn, context, enableExplanation) {
 
 ■ 前提情報
 「Source」とは、userが入力した${fromLabel}の内容。
-「Translation」とは、「Source」の内容を忠実に**${toLabel}に**翻訳・意訳した内容。⚠️誤って${fromLabel}に翻訳しないこと。`;
+「Translation」とは、「Source」の内容を忠実に**${toLabel}に**翻訳・意訳した自然な内容。⚠️誤って${fromLabel}に翻訳しない。発音はここに含めない。`;
   if (context) {
     prompt += `
     ※「Context」は参考情報として活用し、翻訳内容そのものには含めないでください。`;
