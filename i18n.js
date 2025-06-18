@@ -650,5 +650,60 @@ export const i18nText = {
         zh: '（未保存发音）',
         ko: '(발음이 저장되지 않았습니다)',
         de: '(Keine Aussprache gespeichert)'
+    },
+    // ブックマーク保存時の動的メッセージ
+    checking: {
+        ja: '確認中…',
+        en: 'Checking...',
+        es: 'Verificando...',
+        fr: 'Vérification...',
+        zh: '检查中…',
+        ko: '확인 중...',
+        de: 'Prüfung...'
+    },
+    saving: {
+        ja: '保存中…',
+        en: 'Saving...',
+        es: 'Guardando...',
+        fr: 'Enregistrement...',
+        zh: '保存中…',
+        ko: '저장 중...',
+        de: 'Speichern...'
+    },
+    saved: {
+        ja: '保存しました！',
+        en: 'Saved!',
+        es: '¡Guardado!',
+        fr: 'Enregistré !',
+        zh: '已保存！',
+        ko: '저장 완료!',
+        de: 'Gespeichert!'
+    },
+    alreadyBookmarked: {
+        ja: '登録済み',
+        en: 'Bookmarked',
+        es: 'Ya guardado',
+        fr: 'Déjà ajouté',
+        zh: '已收藏',
+        ko: '등록됨',
+        de: 'Gemerkt'
+    },
+    toastBookmarkDuplicate: {
+        ja: 'この翻訳は既にブックマークされています。',
+        en: 'This translation is already bookmarked.',
+        es: 'Esta traducción ya está en tus marcadores.',
+        fr: 'Cette traduction est déjà dans vos favoris.',
+        zh: '该翻译已存在于书签中。',
+        ko: '이 번역은 이미 북마크에 추가되었습니다.',
+        de: 'Diese Übersetzung ist bereits als Lesezeichen gespeichert.'
+    },
+    errorSaveFailed: {
+        ja: '保存に失敗しました',
+        en: 'Failed to save',
+        es: 'Error al guardar',
+        fr: "Échec de l'enregistrement",
+        zh: '保存失败',
+        ko: '저장에 실패했습니다',
+        de: 'Speichern fehlgeschlagen'
     }
 };
