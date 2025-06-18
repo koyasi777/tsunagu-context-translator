@@ -225,6 +225,35 @@ async function saveTranslation(entry) {
   }
 }
 
+/**
+ * 指定された翻訳エントリが既にブックマークに存在するかチェックする
+ * @param {object} entry - チェック対象のエントリ
+ * @returns {Promise<boolean>} - 重複している場合は true, そうでなければ false
+ */
+async function checkIfBookmarkExists(entry) {
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, 'readonly');
+    const store = tx.objectStore(STORE_NAME);
+    const req = store.getAll();
+
+    req.onsuccess = () => {
+      const existingEntries = req.result;
+      // 原文、訳文、文脈がすべて一致する場合に「重複」と判断
+      const isDuplicate = existingEntries.some(existingEntry =>
+        existingEntry.original === entry.original &&
+        existingEntry.translated === entry.translated &&
+        existingEntry.context === entry.context
+      );
+      resolve(isDuplicate);
+    };
+
+    req.onerror = (event) => {
+      console.error("💥 IndexedDB 重複チェック失敗:", event.target.error);
+      reject(event.target.error);
+    };
+  });
+}
+
 async function loadBookmarks() {
   const container = document.getElementById('bookmarkList');
   container.innerHTML = '';
@@ -371,9 +400,13 @@ contextText.addEventListener('input', () => {
 
 // ==== Gemini モデル選択・URL構成 ====
 const GEMINI_MODELS = {
+  'gemini-2.5-flash-lite-preview-06-17': {
+    id: 'gemini-2.5-flash-lite-preview-06-17',
+    label: '🔹 Gemini 2.5 Flash-Lite preview（Default）'
+  },
   'gemini-2.0-flash': {
     id: 'gemini-2.0-flash',
-    label: '🔹 Gemini 2.0 Flash（Default）'
+    label: '🔹 Gemini 2.0 Flash'
   },
   'gemini-2.0-flash-lite': {
     id: 'gemini-2.0-flash-lite',
@@ -401,7 +434,7 @@ const GEMINI_MODELS = {
   },
 };
 
-const DEFAULT_MODEL_KEY = 'gemini-2.0-flash'; // デフォルト設定のモデル
+const DEFAULT_MODEL_KEY = 'gemini-2.5-flash-lite-preview-06-17'; // デフォルト設定のモデル
 
 function getSelectedModel() {
   const key = localStorage.getItem('geminiModel');
@@ -871,51 +904,63 @@ translateBtn.addEventListener('click', async () => {
 });
 
 saveBtn.addEventListener('click', async () => {
+  // 翻訳結果がない場合は早期リターン
   if (!currentTranslation || currentTranslation.trim() === '') {
     const toastEl = document.getElementById('bookmarkToast');
     const toastBody = toastEl.querySelector('.toast-body');
     const toast = bootstrap.Toast.getOrCreateInstance(toastEl);
-
-    // 警告メッセージに変更して表示
     toastBody.textContent = t('toastTranslationNotDone');
     toastEl.classList.remove('bg-success');
     toastEl.classList.add('bg-warning');
     toast.show();
-
-    // 一定時間後に内容と背景色を戻す ＋ トーストを明示的に非表示にする
     setTimeout(() => {
-      toast.hide(); // 🔁 明示的に非表示
+      toast.hide();
       toastBody.textContent = t('toastBookmarkAdded');
       toastEl.classList.remove('bg-warning');
       toastEl.classList.add('bg-success');
     }, 3000);
-
     return;
   }
 
   saveBtn.disabled = true;
   const origHTML = saveBtn.innerHTML;
-  saveBtn.innerHTML = `<span class="spinner-border spinner-border-sm me-1"></span> 保存中…`;
+  saveBtn.innerHTML = `<span class="spinner-border spinner-border-sm me-1"></span> ${t('checking')}`;
+
+  const entry = {
+    timestamp: Date.now(),
+    original: inputText.value.trim(),
+    translated: currentTranslation,
+    pronunciation: currentPronunciationRaw,
+    explanation: currentExplanationRaw,
+    context: contextText.value.trim(),
+    src: currentLangs.src,
+    tgt: currentLangs.tgt
+  };
 
   try {
-    await saveTranslation({
-      timestamp: Date.now(),
-      original: inputText.value.trim(),
-      translated: currentTranslation,
-      pronunciation: currentPronunciationRaw,
-      explanation: currentExplanationRaw,
-      context: contextText.value.trim(),
-      src: currentLangs.src,
-      tgt: currentLangs.tgt
-    });
-    loadBookmarks();
-    saveBtn.innerHTML = `<i class="bi bi-check2-circle me-1"></i> 保存しました！`;
-
+    const isDuplicate = await checkIfBookmarkExists(entry);
     const toastEl = document.getElementById('bookmarkToast');
+    const toastBody = toastEl.querySelector('.toast-body');
     const toast = bootstrap.Toast.getOrCreateInstance(toastEl);
-    toast.show();
+
+    if (isDuplicate) {
+      saveBtn.innerHTML = `<i class="bi bi-exclamation-triangle me-1"></i> ${t('alreadyBookmarked')}`;
+      toastBody.textContent = t('toastBookmarkDuplicate');
+      toastEl.classList.remove('bg-success');
+      toastEl.classList.add('bg-warning');
+      toast.show();
+    } else {
+      saveBtn.innerHTML = `<span class="spinner-border spinner-border-sm me-1"></span> ${t('saving')}`;
+      await saveTranslation(entry);
+      loadBookmarks();
+      saveBtn.innerHTML = `<i class="bi bi-check2-circle me-1"></i> ${t('saved')}`;
+      toastBody.textContent = t('toastBookmarkAdded');
+      toastEl.classList.remove('bg-warning');
+      toastEl.classList.add('bg-success');
+      toast.show();
+    }
   } catch (e) {
-    alert('保存に失敗しました');
+    alert(`${t('errorSaveFailed')}: ${e.message}`);
     saveBtn.innerHTML = origHTML;
   } finally {
     setTimeout(() => {
@@ -924,7 +969,6 @@ saveBtn.addEventListener('click', async () => {
     }, 1500);
   }
 });
-
 
 /**
  * Gemini TTS で音声を再生
