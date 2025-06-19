@@ -173,7 +173,7 @@
           </button>
         </div>
         <div id="contextContainer" class="mb-3 d-none">
-          <textarea id="contextText" class="form-control" rows="2" placeholder="状況やシーンなどの文脈を入力…"></textarea>
+          <textarea id="contextText" class="form-control" rows="2" placeholder="状況,シーン,ニュアンスなどの文脈を入力…"></textarea>
         </div>
         <div class="d-grid gap-2 d-md-flex">
           <button id="translateBtn" class="btn btn-primary me-2 w-100 w-md-auto">翻訳する</button>
@@ -221,8 +221,9 @@
   <!-- ブックマークサイドバー全体 -->
   <div class="offcanvas offcanvas-end" tabindex="-1" id="bookmarkSidebar">
     <div class="offcanvas-header d-flex justify-content-between align-items-center">
-      <h5 id="bookmarkTitle" class="offcanvas-title mb-0 d-flex align-items-center">
-        📚 ブックマーク
+      <h5 class="offcanvas-title mb-0 d-flex align-items-center">
+        <span id="bookmarkTitle">📚 ブックマーク</span>
+        <span id="bookmarkCount" class="badge rounded-pill ms-2 bg-white text-primary border border-primary" style="display: none;"></span>
       </h5>
       <div class="d-flex align-items-center gap-2">
         <button class="btn btn-outline-warning btn-sm" data-bs-toggle="modal" data-bs-target="#dataMgmtModal">
@@ -312,16 +313,23 @@
   <div class="modal fade" id="dataMgmtModal" tabindex="-1">
     <div class="modal-dialog"><div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">データ管理</h5>
+        <h5 id="dataMgmtTitle" class="modal-title">データ管理</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
         <button id="exportJsonBtn" class="btn btn-outline-success w-100 mb-2">JSONでエクスポート</button>
         <div class="mb-2">
-          <label for="importJsonFile" class="form-label">JSONをインポート</label>
+          <label id="importJsonLabel" for="importJsonFile" class="form-label">JSONをインポート</label>
           <input type="file" id="importJsonFile" class="form-control">
         </div>
         <button id="importJsonBtn" class="btn btn-outline-danger w-100">インポート実行</button>
+
+        <hr class="my-4">
+        <div class="text-center">
+          <p id="dangerZoneTitle" class="h6 text-danger mb-1"><i class="bi bi-exclamation-triangle-fill me-1"></i>危険な操作</p>
+          <p id="dangerZoneDesc" class="small text-muted mb-2">この操作は元に戻せません。すべてのブックマークが完全に削除されます。</p>
+          <button id="deleteAllBookmarksBtn" class="btn btn-danger">すべてのブックマークを削除</button>
+        </div>
       </div>
     </div></div>
   </div>
