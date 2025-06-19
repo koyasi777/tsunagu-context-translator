@@ -74,7 +74,7 @@ function updateLanguageLabels() {
   document.querySelector('#modelSettingModal .modal-title').textContent = t('modalModelTitle');
 
   const bookmarkTitle = document.getElementById('bookmarkTitle');
-  if (bookmarkTitle) bookmarkTitle.textContent = t('bookmarkTitle');
+  if (bookmarkTitle) bookmarkTitle.innerHTML = t('bookmarkTitle');
 
   const bookmarkDetailTitle = document.querySelector('#bookmarkDetailModal .modal-title');
   if (bookmarkDetailTitle) bookmarkDetailTitle.textContent = t('bookmarkDetailTitle');
@@ -147,6 +147,28 @@ function updateLanguageLabels() {
 
   const ttsVoiceLabel = document.querySelector('label[for="voiceSelect"]');
   if (ttsVoiceLabel) ttsVoiceLabel.textContent = t('geminiVoice');
+
+  // === データ管理モーダル ===
+  const dataMgmtTitle = document.getElementById('dataMgmtTitle');
+  if (dataMgmtTitle) dataMgmtTitle.textContent = t('modalDataMgmtTitle');
+
+  const btnExportJson = document.getElementById('exportJsonBtn');
+  if (btnExportJson) btnExportJson.textContent = t('btnExportJson');
+
+  const labelImportJson = document.getElementById('importJsonLabel');
+  if (labelImportJson) labelImportJson.textContent = t('labelImportJson');
+
+  const btnImportJson = document.getElementById('importJsonBtn');
+  if (btnImportJson) btnImportJson.textContent = t('btnImportJson');
+
+  const titleDangerZone = document.getElementById('dangerZoneTitle');
+  if (titleDangerZone) titleDangerZone.innerHTML = t('titleDangerZone');
+
+  const descDangerZone = document.getElementById('dangerZoneDesc');
+  if (descDangerZone) descDangerZone.textContent = t('descDangerZone');
+
+  const btnDeleteAll = document.getElementById('deleteAllBookmarksBtn');
+  if (btnDeleteAll) btnDeleteAll.textContent = t('btnDeleteAll');
 
 }
 
@@ -266,6 +288,17 @@ async function loadBookmarks() {
     req.onsuccess = () => resolve(req.result);
     req.onerror = () => reject(req.error);
   });
+
+  const bookmarkCountBadge = document.getElementById('bookmarkCount');
+  if (bookmarkCountBadge) {
+    const count = all.length;
+    if (count > 0) {
+      bookmarkCountBadge.textContent = count;
+      bookmarkCountBadge.style.display = ''; // CSSのデフォルト表示に戻す
+    } else {
+      bookmarkCountBadge.style.display = 'none'; // 0件の場合は非表示
+    }
+  }
 
   all.reverse().forEach((d) => {
     const card = document.createElement('div');
@@ -924,6 +957,7 @@ saveBtn.addEventListener('click', async () => {
 
   saveBtn.disabled = true;
   const origHTML = saveBtn.innerHTML;
+
   saveBtn.innerHTML = `<span class="spinner-border spinner-border-sm me-1"></span> ${t('checking')}`;
 
   const entry = {
@@ -1284,6 +1318,46 @@ importJsonBtn.addEventListener('click', () => {
     }
   };
   reader.readAsText(file);
+});
+
+const deleteAllBookmarksBtn = document.getElementById('deleteAllBookmarksBtn');
+
+deleteAllBookmarksBtn.addEventListener('click', async () => {
+  try {
+    // 1. 削除対象の件数を事前に効率よく取得
+    const txCount = db.transaction(STORE_NAME, 'readonly');
+    const storeCount = txCount.objectStore(STORE_NAME);
+    const countReq = storeCount.count();
+
+    const count = await new Promise((resolve, reject) => {
+      countReq.onsuccess = () => resolve(countReq.result);
+      countReq.onerror = () => reject(countReq.error);
+    });
+
+    // 2. ブックマークが0件なら処理を中断
+    if (count === 0) {
+      alert(t('errorNoBookmarksToDelete'));
+      return;
+    }
+
+    // 3. ユーザーに最終確認（多言語対応を想定）
+    const confirmMessage = t('confirmDeleteAll').replace('${count}', count);
+    if (confirm(confirmMessage)) {
+      // 4. DBの全件削除処理
+      const tx = db.transaction(STORE_NAME, 'readwrite');
+      const store = tx.objectStore(STORE_NAME);
+      store.clear(); // オブジェクトストア内の全データを削除
+      await tx.complete;
+
+      alert(t('alertAllDeleted'));
+
+      // 5. UIの更新とモーダルの非表示
+      loadBookmarks(); // ブックマーク一覧と件数バッジを更新
+      bootstrap.Modal.getInstance(document.getElementById('dataMgmtModal')).hide();
+    }
+  } catch (err) {
+    alert(`${t('errorDeleteFailed')}: ${err.message}`);
+  }
 });
 
 (async () => {
