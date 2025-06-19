@@ -705,5 +705,105 @@ export const i18nText = {
         zh: '保存失败',
         ko: '저장에 실패했습니다',
         de: 'Speichern fehlgeschlagen'
+    },
+    // === データ管理モーダル ===
+    modalDataMgmtTitle: {
+        ja: 'データ管理',
+        en: 'Data Management',
+        es: 'Gestión de datos',
+        fr: 'Gestion des données',
+        zh: '数据管理',
+        ko: '데이터 관리',
+        de: 'Datenverwaltung'
+    },
+    btnExportJson: {
+        ja: 'JSONでエクスポート',
+        en: 'Export as JSON',
+        es: 'Exportar como JSON',
+        fr: 'Exporter en JSON',
+        zh: '导出为 JSON',
+        ko: 'JSON으로 내보내기',
+        de: 'Als JSON exportieren'
+    },
+    labelImportJson: {
+        ja: 'JSONをインポート',
+        en: 'Import JSON',
+        es: 'Importar JSON',
+        fr: 'Importer un JSON',
+        zh: '导入 JSON',
+        ko: 'JSON 가져오기',
+        de: 'JSON importieren'
+    },
+    btnImportJson: {
+        ja: 'インポート実行',
+        en: 'Run Import',
+        es: 'Ejecutar importación',
+        fr: 'Lancer l\'importation',
+        zh: '执行导入',
+        ko: '가져오기 실행',
+        de: 'Import durchführen'
+    },
+    titleDangerZone: {
+        ja: '<i class="bi bi-exclamation-triangle-fill me-1"></i>危険な操作',
+        en: '<i class="bi bi-exclamation-triangle-fill me-1"></i>Dangerous Operation',
+        es: '<i class="bi bi-exclamation-triangle-fill me-1"></i>Operación peligrosa',
+        fr: '<i class="bi bi-exclamation-triangle-fill me-1"></i>Opération dangereuse',
+        zh: '<i class="bi bi-exclamation-triangle-fill me-1"></i>危险操作',
+        ko: '<i class="bi bi-exclamation-triangle-fill me-1"></i>위험한 작업',
+        de: '<i class="bi bi-exclamation-triangle-fill me-1"></i>Gefährlicher Vorgang'
+    },
+    descDangerZone: {
+        ja: 'この操作は元に戻せません。すべてのブックマークが完全に削除されます。',
+        en: 'This operation cannot be undone. All bookmarks will be permanently deleted.',
+        es: 'Esta operación no se puede deshacer. Todos los marcadores se eliminarán permanentemente.',
+        fr: 'Cette opération est irréversible. Tous les favoris seront supprimés définitivement.',
+        zh: '此操作无法撤销。所有书签将被永久删除。',
+        ko: '이 작업은 되돌릴 수 없습니다. 모든 북마크가 영구적으로 삭제됩니다.',
+        de: 'Dieser Vorgang kann nicht rückgängig gemacht werden. Alle Lesezeichen werden dauerhaft gelöscht.'
+    },
+    btnDeleteAll: {
+        ja: 'すべてのブックマークを削除',
+        en: 'Delete All Bookmarks',
+        es: 'Eliminar todos los marcadores',
+        fr: 'Supprimer tous les favoris',
+        zh: '删除所有书签',
+        ko: '모든 북마크 삭제',
+        de: 'Alle Lesezeichen löschen'
+    },
+    errorNoBookmarksToDelete: {
+        ja: '削除するブックマークがありません。',
+        en: 'There are no bookmarks to delete.',
+        es: 'No hay marcadores para eliminar.',
+        fr: 'Il n\'y a aucun favori à supprimer.',
+        zh: '没有可删除的书签。',
+        ko: '삭제할 북마크가 없습니다.',
+        de: 'Es sind keine Lesezeichen zum Löschen vorhanden.'
+    },
+    confirmDeleteAll: {
+        ja: 'すべてのブックマーク（${count}件）を削除します。この操作は元に戻せません。よろしいですか？',
+        en: 'This will delete all ${count} bookmarks. This action cannot be undone. Are you sure?',
+        es: 'Se eliminarán los ${count} marcadores. Esta acción no se puede deshacer. ¿Estás seguro?',
+        fr: 'Cela supprimera les ${count} favoris. Cette action est irréversible. Êtes-vous sûr ?',
+        zh: '将删除所有 ${count} 个书签。此操作无法撤销。确定吗？',
+        ko: '모든 북마크(${count}개)를 삭제합니다. 이 작업은 되돌릴 수 없습니다. 계속하시겠습니까?',
+        de: 'Dadurch werden alle ${count} Lesezeichen gelöscht. Dieser Vorgang kann nicht rückgängig gemacht werden. Sind Sie sicher?'
+    },
+    alertAllDeleted: {
+        ja: 'すべてのブックマークを削除しました。',
+        en: 'All bookmarks have been deleted.',
+        es: 'Se han eliminado todos los marcadores.',
+        fr: 'Tous les favoris ont été supprimés.',
+        zh: '所有书签均已删除。',
+        ko: '모든 북마크를 삭제했습니다.',
+        de: 'Alle Lesezeichen wurden gelöscht.'
+    },
+    errorDeleteFailed: {
+        ja: '削除に失敗しました',
+        en: 'Failed to delete',
+        es: 'Error al eliminar',
+        fr: 'Échec de la suppression',
+        zh: '删除失败',
+        ko: '삭제에 실패했습니다',
+        de: 'Löschen fehlgeschlagen'
     }
 };
