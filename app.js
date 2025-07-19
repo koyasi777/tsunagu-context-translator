@@ -686,7 +686,10 @@ function generatePrompt(text, src, mother, learn, context, enableExplanation) {
     ※「Context」は参考情報として活用し、翻訳内容そのものには含めないでください。`;
   }
   prompt += `
-「Pronunciation」とは、その${learnLabel}の発音方法のみを${motherLabel}を母語とする人が読めるように出力したもの。`;
+「Pronunciation」とは、${learnLabel}の語句の発音を以下の2通りで併記したものである：
+1. ${motherLabel}を母語とする人が直感的に読める発音記述
+2. ${learnLabel}における一般的な音声表記法
+この2つを併記すること。`;
 
   if (enableExplanation) {
     if (context) {
