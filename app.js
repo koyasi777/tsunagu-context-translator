@@ -678,31 +678,33 @@ function generatePrompt(text, src, mother, learn, context, enableExplanation) {
 
   let prompt = `あなたは、${motherLabel}を母語とするuserが、${learnLabel}を学ぶ為に設計された超高性能な翻訳機です。
 
-■ 前提情報
-「Source」とは、userが入力した${fromLabel}の内容。
-「Translation」とは、「Source」の内容を忠実に**${toLabel}に**翻訳・意訳した自然な内容。⚠️誤って${fromLabel}に翻訳しない。発音はここに含めない。`;
+## 前提情報
+- 「Source」とは、userが入力した${fromLabel}の内容。
+- 「Translation」とは、「Source」の内容を忠実に**${toLabel}に**翻訳・意訳した自然な内容。⚠️誤って${fromLabel}に翻訳しない。発音はここに含めない。`;
   if (context) {
     prompt += `
     ※「Context」は参考情報として活用し、翻訳内容そのものには含めないでください。`;
   }
   prompt += `
-「Pronunciation」とは、${learnLabel}の語句の発音を以下の2通りで併記したものである：
-1. ${motherLabel}を母語とする人が直感的に読める発音記述
-2. ${learnLabel}における一般的な音声表記法
-この2つを併記すること。`;
+- 「Pronunciation」とは、学習中の${learnLabel}のその内容を一語一句全部正しく発音できるように、以下の形式で順に表記したものである：
+[${learnLabel}の音声記述体系]:
+[${motherLabel}の音声記述体系記]：
+[IPA（/記号で囲まず、[]のみ使用）]
+※細かく分解せず、全文一気に続けて表記してください。
+`;
 
   if (enableExplanation) {
     if (context) {
       prompt += `
-「Explanation」とは、${learnLabel}を学ぶ、${motherLabel}を母語とする人たちに向けた、**${motherLabel}で**書かれた解説。その**${learnLabel}の内容について**、読み方や発音方法、今回の文脈をリアルに考慮した詳細なニュアンスの説明、例文、類義語、対義語、${learnLabel}を母語とする人たちとの文化的背景の差異などを含める。`;
+- 「Explanation」とは、${learnLabel}を学ぶ、${motherLabel}を母語とする人たちに向けた、**${motherLabel}で**書かれた解説。その**${learnLabel}の内容について**、読み方や発音方法、今回の文脈をリアルに考慮した詳細なニュアンスの説明、例文、類義語、対義語、${learnLabel}を母語とする人たちとの文化的背景の差異などを含める。`;
     } else {
       prompt += `
-「Explanation」とは、${learnLabel}を学ぶ、${motherLabel}を母語とする人たちに向けた、**${motherLabel}で**書かれた解説。その**${learnLabel}の内容について**、読み方や発音方法、詳細なニュアンスの説明、例文、類義語、対義語、${learnLabel}を母語とする人たちとの文化的背景の差異などを含める。`;
+- 「Explanation」とは、${learnLabel}を学ぶ、${motherLabel}を母語とする人たちに向けた、**${motherLabel}で**書かれた解説。その**${learnLabel}の内容について**、読み方や発音方法、詳細なニュアンスの説明、例文、類義語、対義語、${learnLabel}を母語とする人たちとの文化的背景の差異などを含める。`;
     }
   }
 
   prompt += `
-■ userからのinput`
+## userからのinput`
 
   // 補足文脈がある場合にのみ追加
   if (context) {
@@ -717,13 +719,13 @@ ${text}`
 
   prompt += `
 
-■ 以下を実行：
+## 以下を実行：
 
 ※出力制限
 - 返事はせずに以下の出力形式に厳密に従って出力
 - **${context ? '「Source」や「Context」の内容を繰り返し出力しない' : '「Source」の内容を繰り返し出力しない'}**
 
-■ 出力形式`;
+## 出力形式`;
 
   // 翻訳先と解説セクション
   if (enableExplanation) {
