@@ -683,9 +683,7 @@ function generatePrompt(text, src, mother, learn, context, enableExplanation) {
   }
   prompt += `
 - 「Pronunciation」とは、学習中の${learnLabel}のその内容を一語一句全部正しく発音できるように、以下の形式で順に表記したものである：
-[${learnLabel}の音声記述体系]:
-[${motherLabel}の音声記述体系記]：
-[IPA（/記号で囲まず、[]のみ使用）]
+{**${learnLabel}**の音声記述体系} / {${motherLabel}の音声記述体系記} / {IPA（/記号で囲まず、[]のみ使用）}
 ※細かく分解せず、全文一気に続けて表記してください。
 `;
 
