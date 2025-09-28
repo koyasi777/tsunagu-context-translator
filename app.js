@@ -433,21 +433,13 @@ contextText.addEventListener('input', () => {
 
 // ==== Gemini モデル選択・URL構成 ====
 const GEMINI_MODELS = {
-  'gemini-2.5-flash-lite-preview-06-17': {
-    id: 'gemini-2.5-flash-lite-preview-06-17',
-    label: '🔹 Gemini 2.5 Flash-Lite preview（Default）'
+  'gemini-flash-latest': {
+    id: 'gemini-flash-latest',
+    label: '🔹 Gemini Flash Latest（Default）'
   },
-  'gemini-2.0-flash': {
-    id: 'gemini-2.0-flash',
-    label: '🔹 Gemini 2.0 Flash'
-  },
-  'gemini-2.0-flash-lite': {
-    id: 'gemini-2.0-flash-lite',
-    label: '🔹 Gemini 2.0 Flash-Lite'
-  },
-  'gemini-2.5-flash-preview-05-20': {
-    id: 'gemini-2.5-flash-preview-05-20',
-    label: '🔹 Gemini 2.5 Flash preview'
+  'gemini-flash-lite-latest': {
+    id: 'gemini-flash-lite-latest',
+    label: '🔹 Gemini Flash Lite Latest'
   },
   'gemini-2.5-pro-preview-05-06': {
     id: 'gemini-2.5-pro-preview-05-06',
@@ -467,7 +459,7 @@ const GEMINI_MODELS = {
   },
 };
 
-const DEFAULT_MODEL_KEY = 'gemini-2.5-flash-lite-preview-06-17'; // デフォルト設定のモデル
+const DEFAULT_MODEL_KEY = 'gemini-flash-latest'; // デフォルト設定のモデル
 
 function getSelectedModel() {
   const key = localStorage.getItem('geminiModel');
@@ -586,7 +578,7 @@ function detectByScript(text) {
 
 // Gemini で主要言語を判定するための軽量で高速なエンドポイント
 function getFastLanguageDetectionEndpoint() {
-  return `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent`;
+  return `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-lite-latest:generateContent`;
 }
 
 async function determinePrimaryLanguage(text, mother, learn) {
@@ -962,7 +954,6 @@ saveBtn.addEventListener('click', async () => {
 
   saveBtn.disabled = true;
   const origHTML = saveBtn.innerHTML;
-
   saveBtn.innerHTML = `<span class="spinner-border spinner-border-sm me-1"></span> ${t('checking')}`;
 
   const entry = {
