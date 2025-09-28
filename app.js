@@ -461,9 +461,13 @@ const GEMINI_MODELS = {
 
 const DEFAULT_MODEL_KEY = 'gemini-flash-latest'; // デフォルト設定のモデル
 
+// ここでのみ保持（リロードで初期化される）
+let RUNTIME_SELECTED_MODEL = DEFAULT_MODEL_KEY;
 function getSelectedModel() {
-  const key = localStorage.getItem('geminiModel');
-  return key in GEMINI_MODELS ? key : DEFAULT_MODEL_KEY;
+  return RUNTIME_SELECTED_MODEL;
+}
+function setSelectedModel(key) {
+  RUNTIME_SELECTED_MODEL = (key in GEMINI_MODELS) ? key : DEFAULT_MODEL_KEY;
 }
 
 function getGeminiEndpoint() {
@@ -593,7 +597,7 @@ ${text}
 
 【ルール】
 ※ 「${mother}」「${learn}」の場合は**言語コード**のみで出力
-※ 万が一いずれにも該当しない場合は"unkown"と出力
+※ 万が一いずれにも該当しない場合は"unknown"と出力
 ※ 補足・記号・引用なし
 `;
 
@@ -1359,6 +1363,9 @@ deleteAllBookmarksBtn.addEventListener('click', async () => {
 (async () => {
   await openDb();
 
+  // 旧バージョンで保存されていた永続設定をクリーンアップ
+  localStorage.removeItem('geminiModel');
+
   ttsEngineSelect.value = getLocalSetting('ttsEngine') || 'gemini';
   voiceSelect.value = getLocalSetting('ttsVoice') || 'Kore';
   updateVoiceSettingUI();
@@ -1393,10 +1400,12 @@ deleteAllBookmarksBtn.addEventListener('click', async () => {
       modelSelect.appendChild(option);
     });
 
-    modelSelect.value = getSelectedModel();
+    modelSelect.value = DEFAULT_MODEL_KEY; // 常にデフォルトで表示
+    setSelectedModel(DEFAULT_MODEL_KEY);    // ランタイムにも反映
 
     saveModelBtn.addEventListener('click', () => {
-      localStorage.setItem('geminiModel', modelSelect.value);
+      // 今回はセッション中のみ反映（永続化しない）
+      setSelectedModel(modelSelect.value);
       bootstrap.Modal.getInstance(document.getElementById('modelSettingModal')).hide();
     });
   }
