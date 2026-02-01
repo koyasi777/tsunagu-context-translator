@@ -752,6 +752,15 @@ export const i18nText = {
         ko: '<i class="bi bi-exclamation-triangle-fill me-1"></i>위험한 작업',
         de: '<i class="bi bi-exclamation-triangle-fill me-1"></i>Gefährlicher Vorgang'
     },
+    noBookmarks: {
+        ja: 'ブックマークはありません',
+        en: 'No bookmarks yet',
+        es: 'No hay marcadores',
+        fr: 'Aucun favori',
+        zh: '暂无书签',
+        ko: '북마크 없음',
+        de: 'Keine Lesezeichen'
+    },
     descDangerZone: {
         ja: 'この操作は元に戻せません。すべてのブックマークが完全に削除されます。',
         en: 'This operation cannot be undone. All bookmarks will be permanently deleted.',
