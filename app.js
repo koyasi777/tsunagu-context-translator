@@ -315,7 +315,7 @@ async function loadBookmarks() {
             <small class="text-muted">${new Date(d.timestamp).toLocaleString()}</small>
             <div><strong>${t('listOriginal')}</strong> ${d.original}</div>
             <div><strong>${t('listTranslated')}</strong> ${d.translated}</div>
-            <div class="text-truncate" style="max-width: 200px;"><strong>${t('labelPronunciation')}</strong> ${d.pronunciation || '-'}</div>
+            <div class="mb-1"><strong>${t('labelPronunciation')}</strong> ${d.pronunciation || '-'}</div>
           </div>
           <button class="btn btn-sm btn-outline-danger ms-2" data-id="${d.id}">
             <i class="bi bi-trash"></i>
