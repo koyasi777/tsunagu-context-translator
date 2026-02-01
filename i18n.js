@@ -297,6 +297,42 @@ export const i18nText = {
         ko: '⚙️ 언어 설정',
         de: '⚙️ Spracheinstellungen'
     },
+    pronunciationSettings: {
+        ja: '🗣️ 発音表記設定',
+        en: '🗣️ Pronunciation Settings',
+        es: '🗣️ Configuración de pronunciación',
+        fr: '🗣️ Paramètres de prononciation',
+        zh: '🗣️ 发音设置',
+        ko: '🗣️ 발음 표기 설정',
+        de: '🗣️ Aussprache-Einstellungen'
+    },
+    labelPhoneticLearn: {
+        ja: '学習言語の音声表記 (Pinyin等)',
+        en: 'Target Language Phonetics',
+        es: 'Fonética del idioma de destino',
+        fr: 'Phonétique de la langue cible',
+        zh: '目标语言注音 (如拼音)',
+        ko: '학습 언어 음성 표기',
+        de: 'Phonetik der Zielsprache'
+    },
+    labelPhoneticMother: {
+        ja: '母語による読み方 (カタカナ等)',
+        en: 'Native Language Reading',
+        es: 'Lectura en lengua materna',
+        fr: 'Lecture en langue maternelle',
+        zh: '母语注音',
+        ko: '모국어 발음 표기',
+        de: 'Lesung in Muttersprache'
+    },
+    labelIPA: {
+        ja: 'IPA (国際音声記号)',
+        en: 'IPA (International Phonetic Alphabet)',
+        es: 'IPA (Alfabeto Fonético Internacional)',
+        fr: 'API (Alphabet Phonétique International)',
+        zh: 'IPA (国际音标)',
+        ko: 'IPA (국제 음성 기호)',
+        de: 'IPA (Internationales Phonetisches Alphabet)'
+    },
     btnSave: {
         ja: '保存',
         en: 'Save',
