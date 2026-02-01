@@ -158,9 +158,8 @@
       <div class="col-md-6">
         <div class="d-flex justify-content-between align-items-center mb-2">
           <div class="lang-label d-flex align-items-center mb-0" id="srcInfo">翻訳元</div>
-          <!-- モバイル用 Language Settings ボタン -->
           <button id="mobileLangBtn"
-                  class="btn btn-outline-secondary btn-sm d-lg-none"
+                  class="btn btn-outline-secondary btn-sm"
                   data-bs-toggle="modal"
                   data-bs-target="#mobileLangModal">
             <i class="bi bi-gear"></i> Language Settings
@@ -284,6 +283,31 @@
             <select id="modalLearnLang" class="form-select">
             </select>
           </div>
+
+          <hr>
+
+          <div class="mb-3">
+            <label class="form-label fw-bold" id="labelPronunciationSettings">🗣️ 発音表記設定</label>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="checkPhoneticLearn">
+              <label class="form-check-label" for="checkPhoneticLearn" id="labelPhoneticLearn">
+                学習言語の音声表記 (Pinyin等)
+              </label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="checkPhoneticMother">
+              <label class="form-check-label" for="checkPhoneticMother" id="labelPhoneticMother">
+                母語による読み方 (カタカナ等)
+              </label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="checkIPA">
+              <label class="form-check-label" for="checkIPA" id="labelIPA">
+                IPA
+              </label>
+            </div>
+          </div>
+
         </div>
         <div class="modal-footer">
           <button id="saveLangBtn" type="button" class="btn btn-primary">保存</button>
