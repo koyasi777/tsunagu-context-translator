@@ -289,6 +289,7 @@ async function loadBookmarks() {
     req.onerror = () => reject(req.error);
   });
 
+  // 初期ロード時は既存ロジック、または新関数を呼んでも良いが、配列(all)があるのでそのまま設定
   const bookmarkCountBadge = document.getElementById('bookmarkCount');
   if (bookmarkCountBadge) {
     const count = all.length;
@@ -297,6 +298,9 @@ async function loadBookmarks() {
       bookmarkCountBadge.style.display = ''; // CSSのデフォルト表示に戻す
     } else {
       bookmarkCountBadge.style.display = 'none'; // 0件の場合は非表示
+      // 0件時のメッセージ表示
+      container.innerHTML = `<div class="text-center text-muted py-4 small">${t('noBookmarks') || 'No Bookmarks'}</div>`;
+      return;
     }
   }
 
@@ -311,7 +315,7 @@ async function loadBookmarks() {
             <small class="text-muted">${new Date(d.timestamp).toLocaleString()}</small>
             <div><strong>${t('listOriginal')}</strong> ${d.original}</div>
             <div><strong>${t('listTranslated')}</strong> ${d.translated}</div>
-            <div><strong>${t('labelPronunciation')}</strong> ${d.pronunciation || t('pronunciationNotProvided')}</div>
+            <div class="text-truncate" style="max-width: 200px;"><strong>${t('labelPronunciation')}</strong> ${d.pronunciation || '-'}</div>
           </div>
           <button class="btn btn-sm btn-outline-danger ms-2" data-id="${d.id}">
             <i class="bi bi-trash"></i>
@@ -323,11 +327,32 @@ async function loadBookmarks() {
     const deleteBtn = card.querySelector('button[data-id]');
     deleteBtn.addEventListener('click', async (e) => {
       e.stopPropagation(); // モーダル表示をキャンセル
+
+      // ユーザーに確認を求めない場合は即時削除（求めても良い）
+      // if(!confirm("Delete this item?")) return;
+
       const id = Number(deleteBtn.getAttribute('data-id'));
-      const tx = db.transaction(STORE_NAME, 'readwrite');
-      tx.objectStore(STORE_NAME).delete(id);
-      await tx.complete;
-      loadBookmarks();
+
+      try {
+        const tx = db.transaction(STORE_NAME, 'readwrite');
+        tx.objectStore(STORE_NAME).delete(id);
+        await tx.complete;
+
+        // 1. DOM要素を特定して削除（スクロール位置は維持される）
+        card.remove();
+
+        // 2. バッジの数字のみ更新
+        updateBookmarkBadgeCount();
+
+        // 3. もしリストが空になったら「なし」メッセージを表示
+        if (container.children.length === 0) {
+          container.innerHTML = `<div class="text-center text-muted py-4 small">${t('noBookmarks') || 'No Bookmarks'}</div>`;
+        }
+
+      } catch (err) {
+        console.error("削除エラー:", err);
+        alert("削除できませんでした");
+      }
     });
 
     // 詳細モーダルの表示
@@ -347,6 +372,29 @@ async function loadBookmarks() {
 
     container.appendChild(card);
   });
+}
+
+/**
+ * ブックマーク件数バッジを更新する独立関数
+ * ※削除時などに loadBookmarks を呼ばずに件数だけ整合性を取るために使用
+ */
+async function updateBookmarkBadgeCount() {
+  const bookmarkCountBadge = document.getElementById('bookmarkCount');
+  if (!bookmarkCountBadge) return;
+
+  const tx = db.transaction(STORE_NAME, 'readonly');
+  const store = tx.objectStore(STORE_NAME);
+  const req = store.count(); // 全データ取得(getAll)より高速で軽量
+
+  req.onsuccess = () => {
+    const count = req.result;
+    if (count > 0) {
+      bookmarkCountBadge.textContent = count;
+      bookmarkCountBadge.style.display = ''; // 表示
+    } else {
+      bookmarkCountBadge.style.display = 'none'; // 非表示
+    }
+  };
 }
 
 // UI要素
