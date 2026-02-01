@@ -110,6 +110,18 @@ function updateLanguageLabels() {
   const mobileBookmarkBtn = document.querySelector('#mobileMenu button[data-bs-target="#bookmarkSidebar"]');
 
   if (mobileLangBtn)      mobileLangBtn.textContent = t('menuLangSetting');
+
+  // 発音設定ラベルの更新
+  const labelPronunciationSettings = document.getElementById('labelPronunciationSettings');
+  const labelPhoneticLearn = document.getElementById('labelPhoneticLearn');
+  const labelPhoneticMother = document.getElementById('labelPhoneticMother');
+
+  if (labelPronunciationSettings) labelPronunciationSettings.textContent = t('pronunciationSettings');
+  if (labelPhoneticLearn) labelPhoneticLearn.textContent = t('labelPhoneticLearn');
+  if (labelPhoneticMother) labelPhoneticMother.textContent = t('labelPhoneticMother');
+  const labelIPA = document.getElementById('labelIPA');
+  if (labelIPA) labelIPA.textContent = t('labelIPA');
+
   if (mobileApiKeyBtn)    mobileApiKeyBtn.textContent = t('menuApiKey');
   if (mobileModelBtn)     mobileModelBtn.textContent = t('menuModelSetting');
   if (mobileBookmarkBtn)  mobileBookmarkBtn.textContent = t('menuBookmark');
@@ -580,12 +592,26 @@ const saveLangBtn     = document.getElementById('saveLangBtn');
 modalMotherLang.value = getLocalSetting('motherLang');
 modalLearnLang.value  = getLocalSetting('learnLang');
 
+// 発音設定の復元（デフォルトは全て true）
+const checkPhoneticLearn = document.getElementById('checkPhoneticLearn');
+const checkPhoneticMother = document.getElementById('checkPhoneticMother');
+const checkIPA = document.getElementById('checkIPA');
+
+checkPhoneticLearn.checked  = localStorage.getItem('showPhoneticLearn') !== 'false';
+checkPhoneticMother.checked = localStorage.getItem('showPhoneticMother') !== 'false';
+checkIPA.checked            = localStorage.getItem('showIPA') !== 'false';
+
 // 保存ボタン押下時の処理（モーダル内）
 saveLangBtn.addEventListener('click', () => {
   const mother = modalMotherLang.value;
   const learn = modalLearnLang.value;
   localStorage.setItem('motherLang', mother);
   localStorage.setItem('learnLang', learn);
+
+  // 発音設定の保存
+  localStorage.setItem('showPhoneticLearn', checkPhoneticLearn.checked);
+  localStorage.setItem('showPhoneticMother', checkPhoneticMother.checked);
+  localStorage.setItem('showIPA', checkIPA.checked);
 
   // ナビゲーションのセレクトにも反映（デスクトップ表示用）
   navMotherLang.value = mother;
@@ -725,17 +751,35 @@ function generatePrompt(text, src, mother, learn, context, enableExplanation) {
 ## 前提情報
 - 「Source」とは、userが入力した${fromLabel}の内容。
 - 「Translation」とは、「Source」の内容を忠実に**${toLabel}に**翻訳・意訳した自然な内容。⚠️誤って${fromLabel}に翻訳しない。発音はここに含めない。`;
-  if (context) {
-    prompt += `
-    ※「Context」は参考情報として活用し、翻訳内容そのものには含めないでください。`;
-  }
+if (context) {
   prompt += `
+  ※「Context」は参考情報として活用し、翻訳内容そのものには含めないでください。`;
+}
+
+// 発音設定の読み込みとプロンプト構築
+const showPhoneticLearn = localStorage.getItem('showPhoneticLearn') !== 'false';
+const showPhoneticMother = localStorage.getItem('showPhoneticMother') !== 'false';
+const showIPA = localStorage.getItem('showIPA') !== 'false';
+
+let pronFormatParts = [];
+if (showPhoneticLearn) pronFormatParts.push(`{**${learnLabel}**の音声記述体系}`);
+if (showPhoneticMother) pronFormatParts.push(`{${motherLabel}の音声記述体系}`);
+if (showIPA) pronFormatParts.push(`{IPA（/記号で囲まず、[]のみ使用）}`);
+
+// もし全てオフの場合は IPA だけは表示する（安全策）
+if (pronFormatParts.length === 0) {
+    pronFormatParts.push(`{IPA（/記号で囲まず、[]のみ使用）}`);
+}
+
+const pronFormatStr = pronFormatParts.join(' / ');
+
+prompt += `
 - 「Pronunciation」とは、学習中の${learnLabel}のその内容を一語一句全部正しく発音できるように、以下の形式で順に表記したものである：
-{**${learnLabel}**の音声記述体系} / {${motherLabel}の音声記述体系記} / {IPA（/記号で囲まず、[]のみ使用）}
+${pronFormatStr}
 ※細かく分解せず、全文一気に続けて表記してください。
 `;
 
-  if (enableExplanation) {
+if (enableExplanation) {
     if (context) {
       prompt += `
 - 「Explanation」とは、${learnLabel}を学ぶ、${motherLabel}を母語とする人たちに向けた、**${motherLabel}で**書かれた解説。その**${learnLabel}の内容について**、読み方や発音方法、今回の文脈をリアルに考慮した詳細なニュアンスの説明、例文、類義語、対義語、${learnLabel}を母語とする人たちとの文化的背景の差異などを含める。`;
