@@ -34,7 +34,7 @@
 
 ## 🔗 使い方（以下にアクセス👇️）
 
-▶︎ [https://koyasi777.github.io/translator-tsunagu-for-you](https://koyasi777.github.io/Translator-Tsunagu-For-You)
+▶︎ [https://tsunagu.koyasi777.com](https://tsunagu.koyasi777.com)
 
 ※ 初回のみ、使用する翻訳AIサービスのAPIキー（無料）を設定してください。
 
